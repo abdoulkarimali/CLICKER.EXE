@@ -1,0 +1,36 @@
+body {
+    /*background-image: url(images/WhatsApp\ Image\ 2025-04-07\ à\ 16.01.59_2b881432.jpg);*/
+    background-size: 100%;
+    background-repeat: no-repeat;
+}
+
+p, #Score {
+    text-align: center;
+    font-style: italic;
+    color: aquamarine;
+    font-size: larger;
+}
+
+#ORDI:active {
+    transform: scale(1.2);
+    transition: transform 0.1s ease;
+}
+.PC {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px; 
+
+}
+.eau{
+    display: flex;
+    justify-content: left;
+   
+}
+
+h1 {
+    color: #67c5c5;
+    display: flex;
+    justify-content: center; 
+    align-items: center;
+}
