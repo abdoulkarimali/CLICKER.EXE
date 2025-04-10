@@ -15,7 +15,6 @@ let intervalBoost = null;
 
 function boostauto1() {
     let ordi = document.getElementById("ORDI");
-    if (!ordi) return;
 
     if (!intervalBoost) {
         let zoomIn = true;
@@ -38,7 +37,7 @@ window.addEventListener("load", () => {
     let eau = document.getElementById("eaux");
     let EAU = document.getElementById("eau"); 
     let prixauto1 = document.getElementById("prixauto1");
-    let img_clique_auto = document.getElementById("auto1");
+    let img_clique_auto1 = document.getElementById("auto1");
 
     ordi.addEventListener("click", () => {
         ligne += clickpower;
@@ -57,7 +56,7 @@ window.addEventListener("load", () => {
 
         }
     })
-    img_clique_auto.addEventListener("click", () => {
+    img_clique_auto1.addEventListener("click", () => {
         if (ligne >= afprixauto1) {
             ligne -= afprixauto1;
             boost1 = true;

@@ -8,8 +8,9 @@ body {
 p, #Score {
     text-align: center;
     font-style: italic;
-    color: red;
+    color: black;
     font-size: larger;
+    font-weight: bold;
 }
 
 .autos1{
