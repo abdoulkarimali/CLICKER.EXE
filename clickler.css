@@ -1,19 +1,25 @@
 body {
-    /*background-image: url(images/WhatsApp\ Image\ 2025-04-07\ à\ 16.01.59_2b881432.jpg);*/
-    background-size: 100%;
+    /*background-image: url(images/background1.jpg);*/
+    background-size: 75%;
     background-repeat: no-repeat;
+    background-position-x: center;    
 }
 
 p, #Score {
     text-align: center;
     font-style: italic;
-    color: aquamarine;
+    color: red;
     font-size: larger;
+}
+
+.autos1{
+    display: flex;
+    justify-content: left;
 }
 
 #ORDI:active {
     transform: scale(1.2);
-    transition: transform 0.1s ease;
+    transition: transform 0.0001s;
 }
 .PC {
     display: flex;
