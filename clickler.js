@@ -11,10 +11,25 @@ function afficheligne(val) {
     m.innerHTML = val;
 }
 
-function boostauto1(){
-    ligne +=1;
+let intervalBoost = null;
+
+function boostauto1() {
+    let ordi = document.getElementById("ORDI");
+    if (!ordi) return;
+
+    if (!intervalBoost) {
+        let zoomIn = true;
+        intervalBoost = setInterval(() => {
+            ordi.style.transition = 'transform 0.001s';
+            ordi.style.transform = zoomIn ? 'scale(1.2)' : 'scale(1)';
+            zoomIn = !zoomIn;
+        }, 500);
+    }
+
+    ligne += 1;
     afficheligne(ligne);
 }
+
 
 window.addEventListener("load", () => {
     let ordi = document.getElementById("ORDI");
