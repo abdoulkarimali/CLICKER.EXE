@@ -5,6 +5,13 @@ let afboosteau = 1;
 let afprixauto1 = 5;
 let boost1 = false;
 let refreshIntervalIdBoost1;
+let ordi = document.getElementById("ORDI");
+let prixeau = document.getElementById("prixeau");
+let boosteau = document.getElementById("boosteau");
+let imgboost = document.getElementById("eaux");
+let EAU = document.getElementById("eau"); 
+let prixauto1 = document.getElementById("prixauto1");
+let img_clique_auto1 = document.getElementById("auto1");
 
 function afficheligne(val) {
     let m = document.getElementById("ligne");
@@ -31,31 +38,18 @@ function boostauto1() {
 
 
 window.addEventListener("load", () => {
-    let ordi = document.getElementById("ORDI");
-    let prixeau = document.getElementById("prixeau");
-    let boosteau = document.getElementById("boosteau");
-    let eau = document.getElementById("eaux");
-    let EAU = document.getElementById("eau"); 
-    let prixauto1 = document.getElementById("prixauto1");
-    let img_clique_auto1 = document.getElementById("auto1");
+
 
     ordi.addEventListener("click", () => {
         ligne += clickpower;
         afficheligne(ligne);
     });
 
-    eau.addEventListener("click", () => {
-        if (ligne >= afprixeau) {
-            ligne -= afprixeau;
-            clickpower += afboosteau;
+    imgboost.addEventListener("click", () => {
+        fetchlclickboost(3,300,"images/clavier mecanique.png","Clavier mécanique","Boost amélioré de"); 
+    });
 
-            afficheligne(ligne);
-            
-            afprixeau = Math.floor(afprixeau * 1.5);
-            prixeau.innerHTML = afprixeau;
 
-        }
-    })
     img_clique_auto1.addEventListener("click", () => {
         if (ligne >= afprixauto1) {
             ligne -= afprixauto1;
@@ -68,3 +62,28 @@ window.addEventListener("load", () => {
         }
     });
 });
+/*fonction qui va mettre a jour notre amelioration de click)*/
+function fetchlclickboost(boost, prix, image, titre, description) {
+    if (ligne >= afprixeau) {
+        ligne -= afprixeau;
+        clickpower += boost;
+
+        afficheligne(ligne);
+        imgboost.style.pointerEvents = "none";
+
+        setTimeout(() => {
+            afboosteau = boost;
+            afprixeau = prix;
+            imgboost.src = image;
+            prixeau.textContent = afprixeau;
+            boosteau.textContent = afboosteau;
+            /*pour modifier les descriptions*/
+            let p1 = document.querySelector(".eau p:nth-of-type(1)");
+            let p2 = document.querySelector(".eau p:nth-of-type(2)");
+            p1.childNodes[0].nodeValue = titre + " : ";
+            p2.childNodes[0].nodeValue = description + " ";
+
+            imgboost.style.pointerEvents = "auto";
+        }, 500);
+    }
+}

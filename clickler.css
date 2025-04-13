@@ -12,10 +12,14 @@ p, #Score {
     font-size: larger;
     font-weight: bold;
 }
-
+img{
+    width: 64px;
+    height: 64px;
+}
 .autos1{
     display: flex;
     justify-content: left;
+    image-rendering: pixelated;
 }
 
 #ORDI:active {
