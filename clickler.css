@@ -2,15 +2,15 @@
 
 
 
-body {
-    background-image: url(images/background1.png);
-    background-size: 100%;
-    background-repeat: no-repeat;
-    background-position-x: center;    
-    image-rendering: pixelated;
+body {    
     font-family: 'Press Start 2P', monospace;
     line-height: 1.8;
     letter-spacing: 0.5px;
+    background: 
+            linear-gradient(to bottom, #0a0a2a 0%, #1a1a1a 100%),
+            radial-gradient(circle at 20% 30%, rgba(0, 255, 204, 0.15) 0%, transparent 20%),
+            radial-gradient(circle at 80% 70%, rgba(255, 0, 0, 0.15) 0%, transparent 20%);
+    background-attachment: fixed;
 }
 
 p {

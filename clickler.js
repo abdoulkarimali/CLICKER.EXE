@@ -30,14 +30,6 @@ function formatNumber(num) {
 // Fonction qui met à jour le nombre de lignes de code récupérées
 // et met à jour l'image de fond selon le nombre de lignes de code récupérées
 function afficheligne() {
-    if (lignes >= 10000 && palierFondActuel < 3) {
-        document.body.style.backgroundImage = 'url("images/background3.png")';
-        palierFondActuel = 3;
-    } else if (lignes >= 1000 && palierFondActuel < 2) {
-        document.body.style.backgroundImage = 'url("images/background2.png")';
-        palierFondActuel = 2;
-    }
-
     document.getElementById("ligne").textContent = formatNumber(lignes);
 }
 
