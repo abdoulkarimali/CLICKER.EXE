@@ -14,7 +14,7 @@ body {
 }
 
 p {
-    color: red;
+    color: rgb(223, 30, 30);
     font-size: larger;
     font-weight:bolder;
 }
@@ -65,6 +65,7 @@ img{
     top: 17%;
     left: 0%;
     width:550px;
+    z-index: 1;
 }
 
 .item {
@@ -103,3 +104,35 @@ h1 {
     justify-content: center; 
     align-items: center;
 }
+
+button{
+    color: #00ffcc;
+}
+
+h2 {
+    color: antiquewhite;
+}
+
+#save-score-btn {
+    background-color: #28a745; 
+    background: rgba(0, 0, 0, 0.5);
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999; 
+    padding: 10px 20px;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    pointer-events: auto; 
+}
+#leaderboard {
+    background-color: rgba(0, 0, 0, 0.85); 
+    padding: 15px;
+    border-radius: 10px;
+    color: white; 
+}
+

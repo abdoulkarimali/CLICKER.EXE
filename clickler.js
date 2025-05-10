@@ -133,3 +133,105 @@ for (let i = 0; i < ameliorationsAuto.length; i++) {
         acheterAmeliorationAuto(i);
     });
 }
+
+
+// PHP interaction - Session
+function startSession(pseudo) {
+    fetch('session.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: new URLSearchParams({pseudo})
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === 'ok') {
+            console.log('Session started for', data.pseudo);
+        }
+    });
+}
+
+document.getElementById('save-score-btn').addEventListener('click', () => {
+    alert("Bouton cliqué !");
+});
+
+
+// Sauvegarde score
+function saveScore(score) {
+    fetch('save_score.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({score})
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.error) {
+            console.error('Erreur:', data.error);
+        } else {
+            console.log('Score saved successfully');
+            fetchLeaderboard();
+        }
+    })
+    .catch(err => console.error('Erreur requête:', err));
+}
+
+// Leaderboard
+function fetchLeaderboard() {
+    fetch('leaderboard.php')
+    .then(res => res.json())
+    .then(data => {
+        const board = document.getElementById('leaderboard');
+
+        if (!Array.isArray(data)) {
+            board.innerHTML = "<p>Erreur lors du chargement du leaderboard.</p>";
+            console.error("Erreur leaderboard:", data);
+            return;
+        }
+
+        board.innerHTML = '<h2>Top Players</h2><ol>' +
+            data.map(player => `<li>${player.pseudo}: ${player.score}</li>`).join('') +
+            '</ol>';
+    })
+    .catch(err => {
+        console.error("Erreur réseau:", err);
+        document.getElementById('leaderboard').innerHTML = "<p>Erreur réseau.</p>";
+    });
+
+    fetch('leaderboard.php')
+    .then(res => res.json())
+    .then(data => {
+        console.log("Données leaderboard:", data); // <= Affiche les données récupérées
+        const board = document.getElementById('leaderboard');
+
+        if (!Array.isArray(data) || data.length === 0) {
+            board.innerHTML = "<p>Aucun score enregistré pour le moment.</p>";
+            return;
+        }
+
+        board.innerHTML = '<h2>Top Players</h2><ol>' +
+            data.map(player => `<li>${player.pseudo}: ${player.score}</li>`).join('') +
+            '</ol>';
+    });
+
+}
+
+
+// Initialisation
+document.addEventListener('DOMContentLoaded', () => {
+    const pseudo = prompt("Entrez votre pseudo:");
+    if (pseudo) {
+        startSession(pseudo);
+    }
+
+    const saveButton = document.getElementById('save-score-btn');
+    if (saveButton) {
+        saveButton.addEventListener('click', () => {
+            alert("Le bouton fonctionne !");
+            saveScore(lignes); // Enregistre les lignes de code actuelles
+        });
+    } else {
+        console.log("Bouton non trouvé");
+    }
+
+    fetchLeaderboard(); // Charge le leaderboard
+});
+
