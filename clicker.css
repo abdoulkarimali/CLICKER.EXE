@@ -1,15 +1,16 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
-body, #login-screen {    
+body {
     font-family: 'Press Start 2P', monospace;
     line-height: 1.8;
     letter-spacing: 0.5px;
-    background: 
+    background:
         linear-gradient(to bottom, #0a0a2a 0%, #1a1a1a 100%),
         radial-gradient(circle at 20% 30%, rgba(0, 255, 204, 0.15) 0%, transparent 20%),
         radial-gradient(circle at 80% 70%, rgba(255, 0, 0, 0.15) 0%, transparent 20%);
     background-attachment: fixed;
+    margin: 0;
+    padding: 0;
 }
 
 p {
@@ -24,13 +25,15 @@ span {
     text-shadow: 1px 1px 0 #000;
 }
 
-#affichageLigne {
+#affichageLigne,
+#leaderboard {
     text-align: center;
     background: rgba(0, 0, 0, 0.5);
     padding: 5px;
     border-radius: 5px;
-    margin-right: 35%;
-    margin-left: 35%;
+    margin: 0 auto;
+    width: 90%;
+    max-width: 500px;
     font-size: 12px;
 }
 
@@ -55,10 +58,10 @@ img {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 300px; 
+    min-height: 300px;
 }
 
-#ameliorations {  
+#ameliorations {
     flex-direction: column;
     position: absolute;
     top: 17%;
@@ -74,8 +77,13 @@ img {
     margin: 8px 0;
     border-radius: 8px;
     display: flex;
-    align-items:center;
+    align-items: center;
     gap: 15px;
+}
+
+.item img {
+    width: 140px;
+    height: 100px;
 }
 
 .item p {
@@ -84,16 +92,12 @@ img {
     margin: 5px 0;
 }
 
-.item img {
-    width: 140px;
-    height: 100px;
-}
-
 h1 {
     color: purple;
     display: flex;
-    justify-content: center; 
+    justify-content: center;
     align-items: center;
+    text-align: center;
 }
 
 h2 {
@@ -103,8 +107,17 @@ h2 {
 
 #startGameBtn {
     margin: 2%;
-    color: rgb(223, 30, 30);
     font-weight: bolder;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid #df1e1e;
+    padding: 10px;
+    font-family: 'Press Start 2P', monospace;
+    margin-bottom: 15px;
+    width: 80%;
+    max-width: 300px;
+    color: #fff;
+    text-align: center;
+    cursor: pointer;
 }
 
 #login-screen {
@@ -118,33 +131,43 @@ h2 {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    background:
+        linear-gradient(to bottom, #0a0a2a 0%, #1a1a1a 100%),
+        radial-gradient(circle at 20% 30%, rgba(0, 255, 204, 0.15) 0%, transparent 20%),
+        radial-gradient(circle at 80% 70%, rgba(255, 0, 0, 0.15) 0%, transparent 20%);
+    padding: 20px;
+    text-align: center;
+}
+
+
+
+#pseudoInput {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid #df1e1e;
+    color: white;
+    padding: 10px;
+    font-family: 'Press Start 2P', monospace;
+    margin-bottom: 15px;
+    width: 80%;
+    max-width: 300px;
+    text-align: center;
+    outline: none !important; /* Supprime le contour lors du focus */
 }
 
 #save-score-btn {
-    background-color: #28a745; 
+    background-color: #28a745;
     background: rgba(0, 0, 0, 0.5);
     position: fixed;
     top: 20px;
     right: 20px;
     padding: 10px 20px;
-    color: white;
+    color: rgb(223, 30, 30);
+    font-family: 'Press Start 2P', monospace;
+    font-weight: bolder;
     border: none;
     border-radius: 5px;
-    font-weight: bold;
     cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-}
-
-#leaderboard {
-    text-align: center;
-    background: rgba(0, 0, 0, 0.5);
-    padding: 5px;
-    border-radius: 5px;
-    margin-right: 35%;
-    margin-left: 35%;
-    font-size: 12px;
-    color: rgb(223, 30, 30);
-    font-weight: bolder;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
 
 #leaderboard h2 {
@@ -176,26 +199,15 @@ h2 {
     min-width: 60px;
 }
 
-
-
-/* ========== Responsive FIXES ========== */
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
     #ameliorations {
         position: static;
         width: 95%;
-        margin: 20px auto;
-    }
-
-    #game {
-        padding-left: 0 !important;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+        margin: 0 auto;
     }
 
     .item {
         flex-direction: column;
-        align-items: center;
         text-align: center;
     }
 
@@ -221,9 +233,5 @@ h2 {
     #leaderboard {
         width: 90%;
         margin: 10px auto;
-    }
-
-    body {
-        overflow-x: hidden;
     }
 }
