@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
-body, #login-screen {
+body {
     font-family: 'Press Start 2P', monospace;
     line-height: 1.8;
     letter-spacing: 0.5px;
@@ -107,8 +107,17 @@ h2 {
 
 #startGameBtn {
     margin: 2%;
-    color: rgb(223, 30, 30);
     font-weight: bolder;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid #df1e1e;
+    padding: 10px;
+    font-family: 'Press Start 2P', monospace;
+    margin-bottom: 15px;
+    width: 80%;
+    max-width: 300px;
+    color: #fff;
+    text-align: center;
+    cursor: pointer;
 }
 
 #login-screen {
@@ -122,6 +131,27 @@ h2 {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    background:
+        linear-gradient(to bottom, #0a0a2a 0%, #1a1a1a 100%),
+        radial-gradient(circle at 20% 30%, rgba(0, 255, 204, 0.15) 0%, transparent 20%),
+        radial-gradient(circle at 80% 70%, rgba(255, 0, 0, 0.15) 0%, transparent 20%);
+    padding: 20px;
+    text-align: center;
+}
+
+
+
+#pseudoInput {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid #df1e1e;
+    color: white;
+    padding: 10px;
+    font-family: 'Press Start 2P', monospace;
+    margin-bottom: 15px;
+    width: 80%;
+    max-width: 300px;
+    text-align: center;
+    outline: none !important; /* Supprime le contour lors du focus */
 }
 
 #save-score-btn {
