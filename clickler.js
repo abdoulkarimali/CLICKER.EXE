@@ -150,9 +150,6 @@ function startSession(pseudo) {
     });
 }
 
-document.getElementById('save-score-btn').addEventListener('click', () => {
-    alert("Bouton cliqué !");
-});
 
 
 // Sauvegarde score
@@ -187,51 +184,65 @@ function fetchLeaderboard() {
             return;
         }
 
-        board.innerHTML = '<h2>Top Players</h2><ol>' +
-            data.map(player => `<li>${player.pseudo}: ${player.score}</li>`).join('') +
-            '</ol>';
+        board.innerHTML = '<h2>Classement</h2><ol>' +
+        data.map(player => `
+            <li>
+              <span class="pseudo">${player.pseudo}</span>
+              <span class="score">${player.score}</span>
+            </li>
+          `).join('')
+          +
+            '</ol>'; 
     })
     .catch(err => {
         console.error("Erreur réseau:", err);
         document.getElementById('leaderboard').innerHTML = "<p>Erreur réseau.</p>";
     });
+}
 
-    fetch('leaderboard.php')
-    .then(res => res.json())
-    .then(data => {
-        console.log("Données leaderboard:", data); // <= Affiche les données récupérées
-        const board = document.getElementById('leaderboard');
+function toggleGameInteractions(active) {
+    const etat = active ? "auto" : "none";
 
-        if (!Array.isArray(data) || data.length === 0) {
-            board.innerHTML = "<p>Aucun score enregistré pour le moment.</p>";
-            return;
-        }
+    // Clic sur ordi
+    ordi.style.pointerEvents = etat;
 
-        board.innerHTML = '<h2>Top Players</h2><ol>' +
-            data.map(player => `<li>${player.pseudo}: ${player.score}</li>`).join('') +
-            '</ol>';
-    });
+    // Bouton amélioration clic
+    imgAmeliorationParClic.style.pointerEvents = etat;
 
+    // Boutons améliorations auto
+    for (let i = 0; i < ameliorationsAuto.length; i++) {
+        const btn = document.getElementById("imgAmeliorationAuto" + i);
+        if (btn) btn.style.pointerEvents = etat;
+    }
 }
 
 
 // Initialisation
 document.addEventListener('DOMContentLoaded', () => {
-    const pseudo = prompt("Entrez votre pseudo:");
-    if (pseudo) {
-        startSession(pseudo);
-    }
+    // Bloque les interactions du jeu au début
+    toggleGameInteractions(false);
+
+    // Gestion du bouton de démarrage
+    const startBtn = document.getElementById("startGameBtn");
+    startBtn.addEventListener("click", () => {
+        const pseudo = document.getElementById("pseudoInput").value.trim();
+        if (pseudo !== "") {
+            startSession(pseudo);
+            document.getElementById("login-screen").style.display = "none";
+            document.getElementById("game").style.display = "block";
+            toggleGameInteractions(true); // Active le jeu
+            fetchLeaderboard(); // Charge le leaderboard
+        } else {
+            alert("Veuillez entrer un pseudo.");
+        }
+    });
 
     const saveButton = document.getElementById('save-score-btn');
     if (saveButton) {
         saveButton.addEventListener('click', () => {
-            alert("Le bouton fonctionne !");
-            saveScore(lignes); // Enregistre les lignes de code actuelles
+            saveScore(lignes);
         });
-    } else {
-        console.log("Bouton non trouvé");
     }
-
-    fetchLeaderboard(); // Charge le leaderboard
 });
+
 

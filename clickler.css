@@ -1,138 +1,200 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
-
-
-body {    
+body, #login-screen {
     font-family: 'Press Start 2P', monospace;
     line-height: 1.8;
     letter-spacing: 0.5px;
-    background: 
-            linear-gradient(to bottom, #0a0a2a 0%, #1a1a1a 100%),
-            radial-gradient(circle at 20% 30%, rgba(0, 255, 204, 0.15) 0%, transparent 20%),
-            radial-gradient(circle at 80% 70%, rgba(255, 0, 0, 0.15) 0%, transparent 20%);
+    background:
+        linear-gradient(to bottom, #0a0a2a 0%, #1a1a1a 100%),
+        radial-gradient(circle at 20% 30%, rgba(0, 255, 204, 0.15) 0%, transparent 20%),
+        radial-gradient(circle at 80% 70%, rgba(255, 0, 0, 0.15) 0%, transparent 20%);
     background-attachment: fixed;
+    margin: 0;
+    padding: 0;
 }
 
 p {
     color: rgb(223, 30, 30);
     font-size: larger;
-    font-weight:bolder;
+    font-weight: bolder;
 }
+
 span {
     color: #00ffcc;
     font-weight: lighter;
     text-shadow: 1px 1px 0 #000;
 }
 
-#affichageLigne {
+#affichageLigne,
+#leaderboard {
     text-align: center;
     background: rgba(0, 0, 0, 0.5);
     padding: 5px;
     border-radius: 5px;
-    margin-right: 35%;
-    margin-left: 35%;
+    margin: 0 auto;
+    width: 90%;
+    max-width: 500px;
     font-size: 12px;
 }
 
-
-img{
+img {
     width: 140px;
     height: 100px;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
     user-select: none;
 }
-#ORDI{
+
+#ORDI {
+    cursor: pointer;
     width: 250px;
     height: 250px;
 }
+
 #ORDI:active {
     transform: scale(1.2);
     transition: transform 0.0001s;
 }
+
 .PC {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 300px; 
+    min-height: 300px;
 }
 
-#ameliorations {  
+#ameliorations {
     flex-direction: column;
     position: absolute;
     top: 17%;
     left: 0%;
-    width:550px;
+    width: 550px;
     z-index: 1;
 }
 
 .item {
+    cursor: pointer;
     background: rgba(0, 0, 0, 0.7);
     padding: 10px;
     margin: 8px 0;
     border-radius: 8px;
     display: flex;
-    align-items:center;
+    align-items: center;
     gap: 15px;
-    display: grid;
-    grid-template-columns: 140px 1fr;
-
 }
 
+.item img {
+    width: 140px;
+    height: 100px;
+}
 
 .item p {
-    
     text-shadow: 1px 1px 0 #000, -1px -1px 0 #000;
     font-size: 11px;
     margin: 5px 0;
 }
 
-
-
-.item img {
-    width: 140px;
-    height: 100px;
-   
-}
-
-
 h1 {
     color: purple;
     display: flex;
-    justify-content: center; 
+    justify-content: center;
     align-items: center;
-}
-
-button{
-    color: #00ffcc;
+    text-align: center;
 }
 
 h2 {
-    color: antiquewhite;
+    color: rgb(223, 30, 30);
+    font-weight: bolder;
+}
+
+#startGameBtn {
+    margin: 2%;
+    color: rgb(223, 30, 30);
+    font-weight: bolder;
+}
+
+#login-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 #save-score-btn {
-    background-color: #28a745; 
+    background-color: #28a745;
     background: rgba(0, 0, 0, 0.5);
     position: fixed;
     top: 20px;
     right: 20px;
-    z-index: 9999; 
     padding: 10px 20px;
     color: white;
     border: none;
     border-radius: 5px;
     font-weight: bold;
     cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-    pointer-events: auto; 
-}
-#leaderboard {
-    background-color: rgba(0, 0, 0, 0.85); 
-    padding: 15px;
-    border-radius: 10px;
-    color: white; 
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
 
+#leaderboard h2 {
+    color: rgb(223, 30, 30);
+    font-weight: bolder;
+}
+
+#leaderboard ol {
+    list-style-position: inside;
+    padding: 0;
+    margin: 0;
+}
+
+#leaderboard li {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 10px;
+    border-bottom: 1px solid #444;
+}
+
+#leaderboard .pseudo {
+    flex: 1;
+    text-align: left;
+    color: red;
+}
+
+#leaderboard .score {
+    text-align: right;
+    min-width: 60px;
+}
+
+@media (max-width: 768px) {
+    #ameliorations {
+        position: static;
+        width: 95%;
+        margin: 0 auto;
+    }
+
+    .item {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .item img {
+        width: 100%;
+        height: auto;
+        max-width: 140px;
+    }
+
+    #ORDI {
+        width: 60vw;
+        max-width: 200px;
+        height: auto;
+    }
+
+    #save-score-btn {
+        top: 10px;
+        right: 10px;
+        padding: 8px 12px;
+    }
+}
