@@ -14,108 +14,6 @@ body {
     user-select: none;
 }
 
-p {
-    color: rgb(223, 30, 30);
-    font-size: larger;
-    font-weight: bolder;
-}
-
-span {
-    color: #00ffcc;
-    font-weight: lighter;
-    text-shadow: 1px 1px 0 #000;
-}
-
-
-h1 {
-    color: purple;
-    text-align: center;
-    grid-area: header;
-    margin: 10px 0;
-}
-
-.PC {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 200px;
-    grid-area: pc;
-}
-
-#affichageLigne {
-    text-align: center;
-    background: rgba(0, 0, 0, 0.5);
-    padding: 5px;
-    border-radius: 5px;
-    margin: 10px auto;
-    width: 90%;
-    max-width: 500px;
-    font-size: 12px;
-    grid-area: stats;
-}
-
-#ORDI {
-    cursor: pointer;
-    width: 250px;
-    height: 250px;
-    transition: transform 0.1s;
-}
-
-#ORDI:active {
-    transform: scale(1.2);
-    transition: transform 0.0001s;
-}
-
-img {
-    width: 140px;
-    height: 100px;
-}
-
-#ameliorations {
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    max-width: 600px;
-    top: 50%;
-    left: 0;
-    transform: translateY(-50%); 
-}
-
-.item {
-    cursor: pointer;
-    background: rgba(0, 0, 0, 0.7);
-    padding: 10px;
-    margin: 8px 0;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    transition: transform 0.2s;
-}
-
-.item:hover {
-    transform: scale(1.02);
-    background: rgba(20, 0, 20, 0.8);
-}
-
-.item img {
-    width: 140px;
-    height: 100px;
-    object-fit: contain;
-}
-
-.item p {
-    text-shadow: 1px 1px 0 #000, -1px -1px 0 #000;
-    font-size: 11px;
-    margin: 5px 0;
-}
-
-
-h2 {
-    color: rgb(223, 30, 30);
-    font-weight: bolder;
-}
-
 #startGameBtn {
     margin: 2%;
     font-weight: bolder;
@@ -168,18 +66,99 @@ h2 {
     outline: none !important;
 }
 
-#leaderboard {
+p {
+    color: rgb(223, 30, 30);
+    font-size: larger;
+    font-weight: bolder;
+}
+
+span {
+    color: #00ffcc;
+    font-weight: lighter;
+    text-shadow: 1px 1px 0 #000;
+}
+
+
+h1 {
+    color: purple;
+    text-align: center;
+}
+
+.PC {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#affichageLigne, #leaderboard {
     text-align: center;
     background: rgba(0, 0, 0, 0.5);
+    padding: 5px;
     border-radius: 5px;
-    padding: 10px;
-    font-size: 12px;
+    margin: 10px auto;
     width: 90%;
     max-width: 500px;
-    margin: 10px auto;
-    grid-area: stats;
-    align-self: start;
+    font-size: 12px;
 }
+
+#ORDI {
+    cursor: pointer;
+    width: 250px;
+    height: 250px;
+    transition: transform 0.1s;
+}
+
+#ORDI:active {
+    transform: scale(1.2);
+    transition: transform 0.0001s;
+}
+
+
+#ameliorations {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    max-width: 600px;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%); 
+}
+
+.item {
+    cursor: pointer;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: transform 0.2s;
+}
+
+.item:hover {
+    transform: scale(1.02);
+    background: rgba(20, 0, 20, 0.8);
+}
+
+.item img {
+    width: 140px;
+    height: 100px;
+    object-fit: contain;
+}
+
+.item p {
+    text-shadow: 1px 1px 0 #000, -1px -1px 0 #000;
+    font-size: 11px;
+    margin: 5px 0;
+}
+
+
+h2 {
+    color: rgb(223, 30, 30);
+    font-weight: bolder;
+}
+
 
 #leaderboard h2 {
     color: rgb(223, 30, 30);
@@ -211,67 +190,56 @@ h2 {
     min-width: 60px;
 }
 
-/* RESPONSIVE FIX : Laptop/Tablette < 1200px */
-@media (max-width: 1200px) {
-    #ameliorations {
-        position: static;
-        transform: none;
-        width: 100%;
-        max-width: 600px;
-        margin: 0 auto 20px auto;
-    }
-
-    #ORDI {
-        width: clamp(180px, 30vw, 220px);
-        height: auto;
-    }
-}
-
-/* RESPONSIVE Mobile < 768px */
-@media (max-width: 768px) {
-    .item {
+/* Adaptations pour les écrans de 1600px et moins */
+@media (max-width: 1600px) {
+    #ameliorations {    
+        display: flex;
         flex-direction: column;
-        text-align: center;
+        max-width: 400px;
+        top: 50%;
+        left: 0;
+        transform: translateY(-50%); 
     }
-
-    .item img {
-        width: 100px;
-        height: auto;
-    }
-
+    
     #ORDI {
-        width: 50vw;
-        max-width: 180px;
-        height: auto;
+        margin-top: -2%;
+        cursor: pointer;
+        width: 170px;
+        height: 170px;
+        transition: transform 0.1s;
     }
 
     #leaderboard, #affichageLigne {
-        width: 90%;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 5px;
+    padding: 7px;
+    font-size: 10px;
+    max-width: 350px;
+    margin: 8px auto;
     }
-
-    #ameliorations {
-        width: 100%;
-        margin: 0 auto 20px auto;
+    .item {
+    cursor: pointer;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: transform 0.2s;
     }
-}
-
-/* RESPONSIVE Smartphone < 480px */
-@media (max-width: 480px) {
-    h1 {
-        font-size: 1.5rem;
+    
+    .item img {
+        width: 100px;
+        height: 60px;
+        object-fit: contain;
     }
 
     .item p {
-        font-size: 9px;
+        text-shadow: 1px 1px 0 #000, -1px -1px 0 #000;
+        font-size: 8px;
+        margin: 5px 0;
     }
 
-    #ORDI {
-        width: 60vw;
-        max-width: 160px;
-    }
-}
-
-/* Fix scroll horizontal */
-body {
-    overflow-x: hidden;
 }
