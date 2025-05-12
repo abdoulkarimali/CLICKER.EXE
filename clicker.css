@@ -27,7 +27,6 @@ body {
     color: #fff;
     text-align: center;
     cursor: pointer;
-    transition: background 0.3s;
 }
 
 #startGameBtn:hover {
