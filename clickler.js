@@ -186,14 +186,24 @@ ordi.addEventListener("click", () => {
 });
 
 document.getElementById("imgAmeliorationParClic").addEventListener("click", () => {
-    fetchlclickboost("images/clavier_mecanique.png", "Clavier mécanique");
+    
 });
 
-for (let i = 0; i < ameliorationsAuto.length; i++) {
-    document.getElementById("imgAmeliorationAuto" + i).addEventListener("click", () => {
-        acheterAmeliorationAuto(i);
-    });
+const items = document.getElementsByClassName("item");
+for (let i = 0; i < items.length; i++) {
+    if (i == 0){
+        items[i].addEventListener("click", () => {
+            fetchlclickboost("images/clavier_mecanique.png", "Clavier mécanique");
+        });
+    }
+    else{
+        items[i].addEventListener("click", () => {
+            acheterAmeliorationAuto(i-1);
+        });
+    }
+
 }
+
 
 // PHP interaction - Session
 function startSession(pseudo) {
@@ -210,10 +220,6 @@ function startSession(pseudo) {
     });
 }
 
-// Sauvegarde score (manuel, bouton)
-function saveScore(score) {
-    sauvegarderScore();
-}
 
 // Leaderboard
 function fetchLeaderboard() {
@@ -241,7 +247,7 @@ function fetchLeaderboard() {
         });
 }
 
-// Fonction pour activer/désactiver les interactions du jeu
+// Fonction pour activer/désactiver les interactions du jeu (pendant le log screen)
 function toggleGameInteractions(active) {
     const etat = active ? "auto" : "none";
     ordi.style.pointerEvents = etat;
@@ -270,12 +276,4 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("Veuillez entrer un pseudo.");
         }
     });
-
-    // Gestion du bouton de sauvegarde manuel
-    const saveButton = document.getElementById('save-score-btn');
-    if (saveButton) {
-        saveButton.addEventListener('click', () => {
-            saveScore(lignes);
-        });
-    }
 });
