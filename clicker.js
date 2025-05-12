@@ -1,5 +1,4 @@
 // Déclaration variables globales
-let palierFondActuel = 1;
 let lignes = 0;
 let lignesParClic =  1;
 let lignesParSec = 0;
