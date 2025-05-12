@@ -17,7 +17,7 @@ let ameliorationsAuto = [
 // Éléments du DOM utilisés plusieurs fois
 let ordi = document.getElementById("ORDI");
 let imgAmeliorationParClic = document.getElementById("imgAmeliorationParClic");
-let boost = document.getElementById("boost");
+
 
 // === SAUVEGARDE ET CHARGEMENT ===
 
@@ -214,10 +214,11 @@ for (let i = 0; i < items.length; i++) {
 
 }
 
+let boost = document.getElementById("boost");
 let boostActif = false;
 document.addEventListener('DOMContentLoaded', () => {
     boost.addEventListener("click", () => {
-    const coutBoost = 1000 * lignesParSec;
+    const coutBoost = 1000 * lignesParSec + 300;
 
     if (boostActif) return;
 
@@ -230,14 +231,12 @@ document.addEventListener('DOMContentLoaded', () => {
         lignesParClic *= 3;
         refreshligne();
 
-        boost.classList.add("active_boost"); 
 
         setTimeout(() => {
             lignesParClic /= 3;
             afficheligne();
             refreshligne();
             boostActif = false;
-            boost.classList.remove("active_boost");
         }, 30000);
     } 
 });
