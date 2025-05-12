@@ -17,6 +17,7 @@ let ameliorationsAuto = [
 // Éléments du DOM utilisés plusieurs fois
 let ordi = document.getElementById("ORDI");
 let imgAmeliorationParClic = document.getElementById("imgAmeliorationParClic");
+let boost = document.getElementById("boost");
 
 // === SAUVEGARDE ET CHARGEMENT ===
 
@@ -117,14 +118,18 @@ function updateUpgradesDisplay() {
     }
 }
 
+function refreshligne(){
+    document.getElementById("ligneParSec").textContent = formatNumber(lignesParSec);
+    document.getElementById("ligneParClic").textContent = formatNumber(lignesParClic);
+}
+
 // Recalcule le total des lignesParSec selon les améliorations auto
 function recalculerLignesParSec() {
     lignesParSec = 0;
     for (let i = 0; i < ameliorationsAuto.length; i++) {
         lignesParSec += ameliorationsAuto[i].cpt * getBaseBoost(i);
     }
-    document.getElementById("ligneParSec").textContent = formatNumber(lignesParSec);
-    document.getElementById("ligneParClic").textContent = formatNumber(lignesParClic);
+    refreshligne();
 
 }
 
@@ -208,6 +213,36 @@ for (let i = 0; i < items.length; i++) {
     }
 
 }
+
+let boostActif = false;
+document.addEventListener('DOMContentLoaded', () => {
+    boost.addEventListener("click", () => {
+    const coutBoost = 1000 * lignesParSec;
+
+    if (boostActif) return;
+
+    if (lignes >= coutBoost) {
+        lignes -= coutBoost;
+        afficheligne();
+        
+
+        boostActif = true;
+        lignesParClic *= 3;
+        refreshligne();
+
+        boost.classList.add("active_boost"); 
+
+        setTimeout(() => {
+            lignesParClic /= 3;
+            afficheligne();
+            refreshligne();
+            boostActif = false;
+            boost.classList.remove("active_boost");
+        }, 30000);
+    } 
+});
+});
+
 
 
 // PHP interaction - Session
