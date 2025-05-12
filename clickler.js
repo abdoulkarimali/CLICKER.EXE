@@ -32,10 +32,13 @@ function chargerSauvegarde() {
                     if (data.upgrades.boostClic !== undefined) affAmeliorationParClic = data.upgrades.boostClic;
                     if (data.upgrades.prixClic !== undefined) affPrixAmeliorationParClic = data.upgrades.prixClic;
                     for (let i = 0; i < ameliorationsAuto.length; i++) {
-                        if (data.upgrades['auto' + i] !== undefined) {
-                            ameliorationsAuto[i].cpt = data.upgrades['auto' + i];
-                            ameliorationsAuto[i].clicAutoAmelioration = getBaseBoost(i) * Math.pow(1.25, ameliorationsAuto[i].cpt);
+                        let auto = data.upgrades['auto' + i];
+                        if (auto) {
+                            ameliorationsAuto[i].cpt = auto.cpt ?? 0;
+                            ameliorationsAuto[i].cout = auto.cout ?? ameliorationsAuto[i].cout;
+                            ameliorationsAuto[i].clicAutoAmelioration = auto.clicAutoAmelioration ?? ameliorationsAuto[i].clicAutoAmelioration;
                         }
+
                     }
                 }
                 recalculerLignesParSec();
@@ -61,11 +64,11 @@ body: JSON.stringify({
         clic: lignesParClic,
         boostClic: affAmeliorationParClic,
         prixClic: affPrixAmeliorationParClic,
-        auto0: ameliorationsAuto[0].cpt,
-        auto1: ameliorationsAuto[1].cpt,
-        auto2: ameliorationsAuto[2].cpt,
-        auto3: ameliorationsAuto[3].cpt,
-        auto4: ameliorationsAuto[4].cpt
+        auto0: ameliorationsAuto[0],
+        auto1: ameliorationsAuto[1],
+        auto2: ameliorationsAuto[2],
+        auto3: ameliorationsAuto[3],
+        auto4: ameliorationsAuto[4]
     }
 })
 
@@ -121,6 +124,8 @@ function recalculerLignesParSec() {
         lignesParSec += ameliorationsAuto[i].cpt * getBaseBoost(i);
     }
     document.getElementById("ligneParSec").textContent = formatNumber(lignesParSec);
+    document.getElementById("ligneParClic").textContent = formatNumber(lignesParClic);
+
 }
 
 // Fonction gérant l'achat des améliorations de clics automatique
