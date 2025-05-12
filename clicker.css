@@ -197,6 +197,7 @@ h2 {
 }
 
 #boost {
+    cursor: pointer;
     position: fixed;
     bottom: 20px;
     left: 36.5%;
