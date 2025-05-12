@@ -11,6 +11,7 @@ body {
     background-attachment: fixed;
     margin: 0;
     padding: 0;
+    user-select: none;
 }
 
 p {
@@ -25,28 +26,39 @@ span {
     text-shadow: 1px 1px 0 #000;
 }
 
-#affichageLigne,
-#leaderboard {
+
+h1 {
+    color: purple;
+    text-align: center;
+    grid-area: header;
+    margin: 10px 0;
+}
+
+.PC {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+    grid-area: pc;
+}
+
+#affichageLigne {
     text-align: center;
     background: rgba(0, 0, 0, 0.5);
     padding: 5px;
     border-radius: 5px;
-    margin: 0 auto;
+    margin: 10px auto;
     width: 90%;
     max-width: 500px;
     font-size: 12px;
-}
-
-img {
-    width: 140px;
-    height: 100px;
-    user-select: none;
+    grid-area: stats;
 }
 
 #ORDI {
     cursor: pointer;
     width: 250px;
     height: 250px;
+    transition: transform 0.1s;
 }
 
 #ORDI:active {
@@ -54,20 +66,19 @@ img {
     transition: transform 0.0001s;
 }
 
-.PC {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 300px;
+img {
+    width: 140px;
+    height: 100px;
 }
 
 #ameliorations {
+    display: flex;
     flex-direction: column;
-    position: absolute;
-    top: 17%;
-    left: 0%;
-    width: 550px;
-    z-index: 1;
+    position: fixed;
+    max-width: 600px;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%); 
 }
 
 .item {
@@ -79,11 +90,18 @@ img {
     display: flex;
     align-items: center;
     gap: 15px;
+    transition: transform 0.2s;
+}
+
+.item:hover {
+    transform: scale(1.02);
+    background: rgba(20, 0, 20, 0.8);
 }
 
 .item img {
     width: 140px;
     height: 100px;
+    object-fit: contain;
 }
 
 .item p {
@@ -92,13 +110,6 @@ img {
     margin: 5px 0;
 }
 
-h1 {
-    color: purple;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-}
 
 h2 {
     color: rgb(223, 30, 30);
@@ -118,6 +129,11 @@ h2 {
     color: #fff;
     text-align: center;
     cursor: pointer;
+    transition: background 0.3s;
+}
+
+#startGameBtn:hover {
+    background: rgba(255, 255, 255, 0.2);
 }
 
 #login-screen {
@@ -139,8 +155,6 @@ h2 {
     text-align: center;
 }
 
-
-
 #pseudoInput {
     background: rgba(255, 255, 255, 0.1);
     border: 2px solid #df1e1e;
@@ -151,28 +165,26 @@ h2 {
     width: 80%;
     max-width: 300px;
     text-align: center;
-    outline: none !important; /* Supprime le contour lors du focus */
+    outline: none !important;
 }
 
-#save-score-btn {
-    background-color: #28a745;
+#leaderboard {
+    text-align: center;
     background: rgba(0, 0, 0, 0.5);
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 10px 20px;
-    color: rgb(223, 30, 30);
-    font-family: 'Press Start 2P', monospace;
-    font-weight: bolder;
-    border: none;
     border-radius: 5px;
-    cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    font-size: 12px;
+    width: 90%;
+    max-width: 500px;
+    margin: 10px auto;
+    grid-area: stats;
+    align-self: start;
 }
 
 #leaderboard h2 {
     color: rgb(223, 30, 30);
     font-weight: bolder;
+    margin-top: 0;
 }
 
 #leaderboard ol {
@@ -199,39 +211,67 @@ h2 {
     min-width: 60px;
 }
 
-@media (max-width: 768px) {
+/* RESPONSIVE FIX : Laptop/Tablette < 1200px */
+@media (max-width: 1200px) {
     #ameliorations {
         position: static;
-        width: 95%;
-        margin: 0 auto;
+        transform: none;
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto 20px auto;
     }
 
+    #ORDI {
+        width: clamp(180px, 30vw, 220px);
+        height: auto;
+    }
+}
+
+/* RESPONSIVE Mobile < 768px */
+@media (max-width: 768px) {
     .item {
         flex-direction: column;
         text-align: center;
     }
 
     .item img {
-        width: 100%;
-        max-width: 140px;
+        width: 100px;
         height: auto;
     }
 
     #ORDI {
-        width: 60vw;
-        max-width: 200px;
+        width: 50vw;
+        max-width: 180px;
         height: auto;
     }
 
-    #save-score-btn {
-        top: 10px;
-        right: 10px;
-        padding: 8px 12px;
+    #leaderboard, #affichageLigne {
+        width: 90%;
     }
 
-    #affichageLigne,
-    #leaderboard {
-        width: 90%;
-        margin: 10px auto;
+    #ameliorations {
+        width: 100%;
+        margin: 0 auto 20px auto;
     }
+}
+
+/* RESPONSIVE Smartphone < 480px */
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    .item p {
+        font-size: 9px;
+    }
+
+    #ORDI {
+        width: 60vw;
+        max-width: 160px;
+    }
+}
+
+/* Fix scroll horizontal */
+body {
+    overflow-x: hidden;
 }
