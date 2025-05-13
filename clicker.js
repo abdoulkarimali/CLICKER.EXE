@@ -14,90 +14,19 @@ let ameliorationsAuto = [
     { name: 'Ordinateur Quantique', cout: 2000, clicAutoAmelioration: 50, cpt: 0 }
 ];
 
+let boostActif = false;
+let cooldownBoost = 600000;  
+let intervalBoost2 = null;
+let intervalCooldown = null;
+
 // Éléments du DOM utilisés plusieurs fois
 let ordi = document.getElementById("ORDI");
 let imgAmeliorationParClic = document.getElementById("imgAmeliorationParClic");
+let boost = document.getElementById("boost");
+let spanPrixBoost = document.getElementById("prixboost");
+let spanDelaiBoost = document.getElementById("delaiboost");
 
 
-// === SAUVEGARDE ET CHARGEMENT ===
-
-// Fonction pour charger la sauvegarde depuis le serveur
-function sauvegarderScore() {
-    const pseudo = document.getElementById("pseudoInput").value.trim();
-    if (!pseudo) {
-        console.warn("Pseudo manquant, pas de sauvegarde.");
-        return;
-    }
-
-    const upgrades = {
-        name: ameliorationsAuto.map(auto => auto.name),
-        cout: ameliorationsAuto.map(auto => auto.cout),
-        clicBoost: ameliorationsAuto.map(auto => auto.clicAutoAmelioration),
-        cpt: ameliorationsAuto.map(auto => auto.cpt)
-    };
-
-    fetch('CLICKER.EXE/save_score.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-            pseudo: pseudo,
-            score: lignes,
-            upgrades: JSON.stringify(upgrades)
-        })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            console.log(data.message);
-        } else {
-            console.error("Erreur sauvegarde:", data.message);
-        }
-    })
-    .catch(err => console.error("Erreur réseau save_score:", err));
-}
-
-
-
-// Fonction pour sauvegarder le score et les upgrades sur le serveur
-function chargerSauvegarde() {
-    const pseudo = document.getElementById("pseudoInput").value.trim();
-    if (!pseudo) return;
-
-    fetch(`CLICKER.EXE/get_save.php?pseudo=${encodeURIComponent(pseudo)}`)
-        .then(res => res.json())
-        .then(data => {
-            if (data.success && data.save) {
-                const sauvegarde = data.save;
-                lignes = sauvegarde.score;
-
-                if (sauvegarde.upgrades) {
-                    lignesParClic = sauvegarde.upgrades.clic || lignesParClic;
-                    affAmeliorationParClic = sauvegarde.upgrades.clicBoost || affAmeliorationParClic;
-                    affPrixAmeliorationParClic = sauvegarde.upgrades.prixClic || affPrixAmeliorationParClic;
-
-                    if (Array.isArray(sauvegarde.upgrades.autoBoosts)) {
-                        sauvegarde.upgrades.autoBoosts.forEach((cpt, index) => {
-                            ameliorationsAuto[index].cpt = cpt;
-                        });
-                    }
-                }
-
-                recalculerLignesParSec();
-                afficheligne();
-                updateUpgradesDisplay();
-            } else {
-                console.error("Erreur chargement sauvegarde:", data.message);
-            }
-        })
-        .catch(err => console.error("Erreur réseau get_save:", err));
-}
-
-// Sauvegarde automatique toutes les 30 secondes
-function lancerSauvegardeAuto() {
-    setInterval(sauvegarderScore, 30000);
-}
-
-// === OUTILS ===
 
 // Pour recalculer le boost de base d'une amélioration auto (selon l'index)
 function getBaseBoost(i) {
@@ -105,8 +34,10 @@ function getBaseBoost(i) {
     return base[i];
 }
 
-// Formatage des nombres (K, M)
+// Formatage des nombres (K, M, B, T)
 function formatNumber(num) {
+    if (num >= 1000000000000) return `${(num / 1000000000000).toFixed(1)}T`;
+    if (num >= 1000000000) return `${(num / 1000000000).toFixed(1)}B`;
     if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
     if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
     return num.toFixed(1);
@@ -139,7 +70,6 @@ function recalculerLignesParSec() {
         lignesParSec += ameliorationsAuto[i].cpt * getBaseBoost(i);
     }
     refreshligne();
-
 }
 
 // Fonction gérant l'achat des améliorations de clics automatique
@@ -155,6 +85,7 @@ function acheterAmeliorationAuto(index) {
         am.cout = Math.floor(am.cout * Math.pow(1.15, am.cpt));
         document.getElementById("prixAmeliorationAuto" + index).textContent = formatNumber(am.cout);
         afficheligne(lignes);
+        majprixboost(1000 * lignesParSec + 300);
         activerBoostAuto();
         sauvegarderScore(); // Sauvegarde à chaque achat
     }
@@ -197,15 +128,42 @@ function fetchlclickboost(image, titre) {
     }
 }
 
-// GESTION DES EVENTS 
+// Gestion du boost de clic x3
+
+function majprixboost(coutBoost) {
+    spanPrixBoost.textContent = coutBoost;
+}
+
+function startCooldown() { 
+
+    
+    if (intervalCooldown) {
+        clearInterval(intervalCooldown);
+    }
+
+    let remainingCooldown = cooldownBoost / 1000;
+    intervalCooldown = setInterval(function() {
+    spanDelaiBoost.textContent = "attendre " + remainingCooldown + "s";
+    remainingCooldown--;
+    if (remainingCooldown <= 0) {
+        clearInterval(intervalCooldown);
+        boostActif = false;
+        spanDelaiBoost.textContent = "Boost disponible";
+    }
+    }, 1000);
+
+}
+
+
+
+
+
+
+// GESTION DES EVENTS PRINCIPAUX
 
 ordi.addEventListener("click", () => {
     lignes += lignesParClic;
     afficheligne(lignes);
-});
-
-document.getElementById("imgAmeliorationParClic").addEventListener("click", () => {
-    
 });
 
 const items = document.getElementsByClassName("item");
@@ -220,80 +178,49 @@ for (let i = 0; i < items.length; i++) {
             acheterAmeliorationAuto(i-1);
         });
     }
-
 }
 
-let boost = document.getElementById("boost");
-let boostActif = false;
-document.addEventListener('DOMContentLoaded', () => {
-    boost.addEventListener("click", () => {
-    const coutBoost = 1000 * lignesParSec + 300;
+boost.addEventListener("click", () => {
+        const coutBoost = 1000 * lignesParSec + 300;
+        const dureeBoost = 30; 
 
-    if (boostActif) return;
+        if (boostActif) return; 
+       
+        majprixboost(coutBoost);
 
-    if (lignes >= coutBoost) {
-        lignes -= coutBoost;
-        afficheligne();
-        
-
-        boostActif = true;
-        lignesParClic *= 3;
-        refreshligne();
-
-
-        setTimeout(() => {
-            lignesParClic /= 3;
+        if (lignes >= coutBoost) {
+            lignes -= coutBoost;
             afficheligne();
+
+            boostActif = true;  
+            lignesParClic *= 3;  
             refreshligne();
-            boostActif = false;
-        }, 30000);
-    } 
-});
-});
 
+            
+            if (intervalBoost2) {
+                clearInterval(intervalBoost2);
+            }
 
+            let tempsRestant = dureeBoost;
+            spanDelaiBoost.textContent = tempsRestant + "s";
 
-// PHP interaction - Session
-function startSession(pseudo) {
-    fetch('CLICKER.EXE/session.php', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: new URLSearchParams({ pseudo })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.status === 'ok') {
-            console.log('Session started for', data.pseudo);
+            intervalBoost2 = setInterval(function() {
+                tempsRestant--;
+                spanDelaiBoost.textContent = tempsRestant + "s";
+                if (tempsRestant <= 0) {
+                    clearInterval(intervalBoost2);  
+                    lignesParClic /= 3; 
+                    afficheligne();
+                    refreshligne();
+                    spanDelaiBoost.textContent = "non disponible"; 
+                    startCooldown();
+                }
+            }, 1000);
         }
     });
-}
 
 
-// Leaderboard
-function fetchLeaderboard() {
-    fetch('CLICKER.EXE/leaderboard.php')
-        .then(res => res.json())
-        .then(data => {
-            if (data.success && Array.isArray(data.leaderboard)) {
-                const board = document.getElementById('leaderboard');
-                board.innerHTML = '<h2>Classement</h2><ol>' +
-                    data.leaderboard.map(player => `
-                        <li>
-                            <span class="pseudo">${player.pseudo}</span>
-                            <span class="score">${player.score}</span>
-                        </li>
-                    `).join('') +
-                    '</ol>';
-            } else {
-                console.error("Erreur leaderboard:", data.message);
-                document.getElementById('leaderboard').innerHTML = "<p>Erreur lors du chargement du leaderboard.</p>";
-            }
-        })
-        .catch(err => {
-            console.error("Erreur réseau:", err);
-            document.getElementById('leaderboard').innerHTML = "<p>Erreur réseau.</p>";
-        });
-}
+
 
 // Fonction pour activer/désactiver les interactions du jeu (pendant le log screen)
 function toggleGameInteractions(active) {
@@ -306,23 +233,108 @@ function toggleGameInteractions(active) {
     }
 }
 
-// Initialisation du jeu au démarrage
-document.addEventListener('DOMContentLoaded', () => {
-    toggleGameInteractions(false);
-    const startBtn = document.getElementById("startGameBtn");
-    startBtn.addEventListener("click", () => {
-        const pseudo = document.getElementById("pseudoInput").value.trim();
-        if (pseudo !== "") {
-            startSession(pseudo);
-            document.getElementById("login-screen").style.display = "none";
-            document.getElementById("game").style.display = "block";
-            toggleGameInteractions(true);
-            chargerSauvegarde();
-            fetchLeaderboard();
-            lancerSauvegardeAuto(); 
-        } else {
-            alert("Veuillez entrer un pseudo.");
-        }
-    });
-});
 
+// Gestion de la sauvegarde
+function sauvegarderScore() {
+    const data = {
+        pseudo: currentPseudo,
+        lignes: lignes,
+        lignesParClic: lignesParClic,
+        lignesParSec: lignesParSec,
+        affPrixAmeliorationParClic: affPrixAmeliorationParClic,
+        affAmeliorationParClic: affAmeliorationParClic,
+        ameliorationsAuto: ameliorationsAuto
+    };
+
+    fetch('CLICKER.EXE/save.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    });
+}
+
+let currentPseudo = "";
+
+function chargerSauvegarde(pseudo) {
+    fetch(`CLICKER.EXE/load.php?pseudo=${encodeURIComponent(pseudo)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data) {
+                lignes = parseInt(data.lignes);
+                lignesParClic = parseInt(data.lignesParClic);
+                lignesParSec = parseInt(data.lignesParSec);
+                affPrixAmeliorationParClic = parseFloat(data.affPrixAmeliorationParClic);
+                affAmeliorationParClic = parseFloat(data.affAmeliorationParClic);
+                ameliorationsAuto = JSON.parse(data.ameliorationsAuto);
+                majprixboost(1000 * lignesParSec + 300);
+                afficheligne();
+                refreshligne();
+                updateUpgradesDisplay();
+                recalculerLignesParSec();
+                activerBoostAuto();
+            }
+        });
+}
+
+function chargerLeaderboard() {
+    fetch('CLICKER.EXE/leaderboard.php')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erreur réseau ou serveur : ' + response.status);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Leaderboard data:', data);
+
+            const leaderboardDiv = document.getElementById('leaderboard');
+
+            if (Array.isArray(data)) {
+                let html = '<h2>Classement : Top 10</h2><ol>';
+                data.forEach(player => {
+                    html += `<li><span class="pseudo">${player.pseudo}</span><span class="score">${formatNumber(player.lignes)}</span></li>`;
+                });
+                html += '</ol>';
+                leaderboardDiv.innerHTML = html;
+            } else if (data && data.error) {
+                console.error('Erreur SQL/PHP côté serveur :', data.error);
+                leaderboardDiv.innerHTML = '<p>Erreur de chargement du classement.</p>';
+            } else {
+                console.error('Erreur leaderboard: réponse inattendue', data);
+                leaderboardDiv.innerHTML = '<p>Aucune donnée reçue.</p>';
+            }
+        })
+        .catch(err => {
+            console.error('Erreur fetch leaderboard:', err);
+            const leaderboardDiv = document.getElementById('leaderboard');
+            leaderboardDiv.innerHTML = '<p>Erreur de connexion au classement.</p>';
+        });
+}
+
+
+// Sauvegardes automatiques
+
+setInterval(chargerLeaderboard, 10000);
+setInterval(() => {
+    if (currentPseudo !== "") {
+        sauvegarderScore();
+    }
+}, 10000);
+
+
+
+// Initialisation du jeu au démarrage
+let startBtn = document.getElementById("startGameBtn");
+startBtn.addEventListener("click", () => {
+    const pseudo = document.getElementById("pseudoInput").value.trim();
+    if (pseudo !== "") {
+        currentPseudo = pseudo;
+        chargerLeaderboard();
+        chargerSauvegarde(pseudo);
+        document.getElementById("login-screen").style.display = "none";
+        document.getElementById("game").style.display = "block";
+        toggleGameInteractions(true);
+    } else {
+        alert("Veuillez entrer un pseudo.");
+    }
+});

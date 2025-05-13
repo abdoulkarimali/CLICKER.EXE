@@ -1,25 +1,28 @@
 <?php
-require_once 'config.php';
 
-header('Content-Type: application/json'); 
+$host = 'localhost';
+$db = 'clicker';
+$user = 'test';
+$pass = 'test123456789';
 
-$response = ["success" => false, "leaderboard" => [], "message" => ""];
+header('Content-Type: application/json');
 
-$sql = "SELECT pseudo, score, upgrades FROM leaderboard ORDER BY score DESC LIMIT 10";
-$result = $conn->query($sql);
-
-if ($result && $result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $row['upgrades'] = json_decode($row['upgrades'], true);
-        $response['leaderboard'][] = $row;
-    }
-    $response['success'] = true;
-    $response['message'] = "Leaderboard récupéré avec succès.";
-} else {
-    $response['message'] = "Aucun score trouvé.";
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8", $user, $pass, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+    ]);
+} catch (PDOException $e) {
+    http_response_code(500);
+    echo json_encode(['error' => 'Erreur connexion DB: ' . $e->getMessage()]);
+    exit;
 }
 
-echo json_encode($response);
-
-$conn->close();
+try {
+    $stmt = $pdo->query("SELECT pseudo, lignes FROM sauvegardes ORDER BY lignes DESC LIMIT 10");
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    echo json_encode($result);
+} catch (PDOException $e) {
+    http_response_code(500);
+    echo json_encode(['error' => 'Erreur SQL: ' . $e->getMessage()]);
+}
 ?>
