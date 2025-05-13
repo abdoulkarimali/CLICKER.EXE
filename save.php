@@ -40,16 +40,17 @@ if (!$current) {
 
 if ($shouldUpdate) {
     $stmt = $pdo->prepare("
-        INSERT INTO sauvegardes (pseudo, lignes, lignesParClic, lignesParSec, affPrixAmeliorationParClic, affAmeliorationParClic, ameliorationsAuto)
-        VALUES (:pseudo, :lignes, :lignesParClic, :lignesParSec, :prixClic, :boostClic, :ameliorations)
+        INSERT INTO sauvegardes (pseudo, lignes, lignesParClic, lignesParSec, affPrixAmeliorationParClic, affAmeliorationParClic, ameliorationsAuto, nbAchatsClic)
+        VALUES (:pseudo, :lignes, :lignesParClic, :lignesParSec, :prixClic, :boostClic, :ameliorationsn ;nbAchatsClic)
         ON DUPLICATE KEY UPDATE
             lignes = VALUES(lignes),
             lignesParClic = VALUES(lignesParClic),
             lignesParSec = VALUES(lignesParSec),
             affPrixAmeliorationParClic = VALUES(affPrixAmeliorationParClic),
             affAmeliorationParClic = VALUES(affAmeliorationParClic),
-            ameliorationsAuto = VALUES(ameliorationsAuto)
-    ");
+            ameliorationsAuto = VALUES(ameliorationsAuto),
+            nbAchatsClic = VALUES(nbAchatsClic)
+        ");
     
     $stmt->execute([
         ':pseudo' => $data['pseudo'],
@@ -58,7 +59,8 @@ if ($shouldUpdate) {
         ':lignesParSec' => $data['lignesParSec'],
         ':prixClic' => $data['affPrixAmeliorationParClic'],
         ':boostClic' => $data['affAmeliorationParClic'],
-        ':ameliorations' => json_encode($data['ameliorationsAuto'])
+        ':ameliorations' => json_encode($data['ameliorationsAuto']),
+        ':nbAchatsClic' => $data['nbAchatsClic']
     ]);
 
     echo json_encode(['success' => true, 'message' => 'Score mis à jour']);

@@ -15,6 +15,7 @@ let ameliorationsAuto = [
     { name: 'Ordinateur Quantique', cout: 100000, clicAutoAmelioration: 2000, cpt: 0 }
 ];
 
+let coutBoost = 2000;
 let boostActif = false;
 let cooldownBoost = 600000;  
 let intervalBoost2 = null;
@@ -49,15 +50,6 @@ function afficheligne() {
     document.getElementById("ligne").textContent = formatNumber(lignes);
 }
 
-// Met à jour l'affichage des améliorations (prix, boosts, etc.)
-function updateUpgradesDisplay() {
-    document.getElementById("prixAmeliorationParClic").textContent = formatNumber(affPrixAmeliorationParClic);
-    document.getElementById("boostClic").textContent = formatNumber(affAmeliorationParClic);
-    for (let i = 0; i < ameliorationsAuto.length; i++) {
-        document.getElementById("prixAmeliorationAuto" + i).textContent = formatNumber(ameliorationsAuto[i].cout);
-        document.getElementById("boostParSec" + i).textContent = formatNumber(ameliorationsAuto[i].clicAutoAmelioration);
-    }
-}
 
 function refreshligne(){
     document.getElementById("ligneParSec").textContent = formatNumber(lignesParSec);
@@ -81,21 +73,21 @@ function acheterAmeliorationAuto(index) {
         chargerLeaderboard();
         lignes -= am.cout;
         am.cpt++;
-
-        // Nouvelle formule boost additif
         lignesParSec = 0;
         for (let i = 0; i < ameliorationsAuto.length; i++) {
             let base = getBaseBoost(i);
             lignesParSec += ameliorationsAuto[i].cpt * (base * (1 + 0.10 * ameliorationsAuto[i].cpt));
+            document.getElementById("qttItem" + (index+1)).textContent = ameliorationsAuto[index].cpt;
+
         }
 
-        // Nouveau coût scaling
         am.cout = Math.floor(am.cout * Math.pow(1.12 + 0.005 * am.cpt, am.cpt));
         am.clicAutoAmelioration = getBaseBoost(index) * (1 + 0.10 * am.cpt);
 
         document.getElementById("ligneParSec").textContent = formatNumber(lignesParSec);
         document.getElementById("boostParSec" + index).textContent = formatNumber(am.clicAutoAmelioration);
         document.getElementById("prixAmeliorationAuto" + index).textContent = formatNumber(am.cout);
+        
 
         afficheligne();
         majprixboost(1000 * lignesParSec + 300);
@@ -126,11 +118,11 @@ function fetchlclickboost(image, titre) {
         achatsClic++; // Compte les achats
         
         document.getElementById("ligneParClic").textContent = formatNumber(lignesParClic);
+        document.getElementById("qttItem0").textContent = achatsClic;
         afficheligne();
         
         imgAmeliorationParClic.style.pointerEvents = "none";
         setTimeout(() => {
-            // Nouvelle formule d'évolution
             affPrixAmeliorationParClic *= (1.15 + 0.002 * achatsClic);
             affAmeliorationParClic *= 1.2;
 
@@ -185,12 +177,15 @@ ordi.addEventListener("click", () => {
 
 const items = document.getElementsByClassName("item");
 for (let i = 0; i < items.length; i++) {
+
     if (i == 0){
         items[i].addEventListener("click", () => {
             fetchlclickboost("CLICKER.EXE/images/clavier_mecanique.png", "Clavier mécanique");
         });
+        document.getElementById("qttItem0").textContent = achatsClic;
     }
     else{
+        document.getElementById("qttItem" + i).textContent = ameliorationsAuto[i-1].cpt;
         items[i].addEventListener("click", () => {
             acheterAmeliorationAuto(i-1);
         });
@@ -198,44 +193,42 @@ for (let i = 0; i < items.length; i++) {
 }
 
 boost.addEventListener("click", () => {
-    const coutBoost = 1000 * lignesParSec + 0.01 * lignes + 500;
     const dureeBoost = 30;
 
     if (boostActif) return;
 
-    majprixboost(coutBoost);
-
     if (lignes >= coutBoost) {
         sauvegarderScore();
         lignes -= coutBoost;
+        majprixboost(coutBoost);
         afficheligne();
 
         boostActif = true;
-
-        // Multiplicateur dynamique basé sur lignesParSec
-        const multiplier = 2 + Math.log10(lignesParSec + 10);
-        lignesParClic *= multiplier;
+        lignesParClic *= 3;
         refreshligne();
 
-        if (intervalBoost2) clearInterval(intervalBoost2);
+        if (intervalBoost2) {
+            clearInterval(intervalBoost2);
+        }
 
         let tempsRestant = dureeBoost;
         spanDelaiBoost.textContent = tempsRestant + "s";
 
-        intervalBoost2 = setInterval(() => {
+        intervalBoost2 = setInterval(function() {
             tempsRestant--;
             spanDelaiBoost.textContent = tempsRestant + "s";
             if (tempsRestant <= 0) {
                 clearInterval(intervalBoost2);
-                lignesParClic /= multiplier;
+                lignesParClic /= 3; // retour à la normale
                 afficheligne();
                 refreshligne();
                 spanDelaiBoost.textContent = "non disponible";
-                startCooldown();
+                startCooldown(); // relance cooldown 10 min
             }
         }, 1000);
     }
 });
+
 
 
 
@@ -253,6 +246,25 @@ function toggleGameInteractions(active) {
 
 
 // Gestion de la sauvegarde
+
+// Met à jour l'affichage des améliorations (prix, boosts, etc.)
+function updateUpgradesDisplay() {
+    document.getElementById("prixAmeliorationParClic").textContent = formatNumber(affPrixAmeliorationParClic);
+    document.getElementById("boostClic").textContent = formatNumber(affAmeliorationParClic);
+    for (let i = 0; i < ameliorationsAuto.length; i++) {
+        document.getElementById("prixAmeliorationAuto" + i).textContent = formatNumber(ameliorationsAuto[i].cout);
+        document.getElementById("boostParSec" + i).textContent = formatNumber(ameliorationsAuto[i].clicAutoAmelioration);
+    }
+}
+
+function updateAchatDisplays() {
+    document.getElementById("qttItem0").textContent = achatsClic;
+
+    for (let i = 1; i < ameliorationsAuto.length + 1; i++) {
+        document.getElementById("qttItem" + i).textContent = ameliorationsAuto[i].cpt;
+    }
+}
+
 function sauvegarderScore() {
     const data = {
         pseudo: currentPseudo,
@@ -261,15 +273,17 @@ function sauvegarderScore() {
         lignesParSec: lignesParSec,
         affPrixAmeliorationParClic: affPrixAmeliorationParClic,
         affAmeliorationParClic: affAmeliorationParClic,
+        achatsClic: achatsClic,
         ameliorationsAuto: ameliorationsAuto
     };
 
     fetch('CLICKER.EXE/save.php', {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     });
 }
+
 
 let currentPseudo = "";
 
@@ -283,13 +297,16 @@ function chargerSauvegarde(pseudo) {
                 lignesParSec = parseInt(data.lignesParSec);
                 affPrixAmeliorationParClic = parseFloat(data.affPrixAmeliorationParClic);
                 affAmeliorationParClic = parseFloat(data.affAmeliorationParClic);
+                achatsClic = parseInt(data.achatsClic || 0); // <--- AJOUTÉ
                 ameliorationsAuto = JSON.parse(data.ameliorationsAuto);
+
                 majprixboost(1000 * lignesParSec + 300);
                 afficheligne();
                 refreshligne();
                 updateUpgradesDisplay();
                 recalculerLignesParSec();
                 activerBoostAuto();
+                updateAchatDisplays();
             }
         });
 }
