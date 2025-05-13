@@ -1,10 +1,11 @@
 // Déclaration variables globales
 let palierFondActuel = 1;
 let lignes = 0;
-let lignesParClic =  0.2;
+let lignesParClic =  1;
 let lignesParSec = 0;
-let affPrixAmeliorationParClic = 100;
-let affAmeliorationParClic = 0.1;
+let affPrixAmeliorationParClic = 50;
+let affAmeliorationParClic = 1.5;
+let achatsClic = 0;
 let intervalBoost = null;
 let ameliorationsAuto = [
     { name: 'IDE', cout: 200, clicAutoAmelioration: 5, cpt: 0 },
@@ -80,18 +81,27 @@ function acheterAmeliorationAuto(index) {
         chargerLeaderboard();
         lignes -= am.cout;
         am.cpt++;
-        lignesParSec += getBaseBoost(index);
-        am.clicAutoAmelioration *= 1.25;
+
+        // Nouvelle formule boost additif
+        lignesParSec = 0;
+        for (let i = 0; i < ameliorationsAuto.length; i++) {
+            let base = getBaseBoost(i);
+            lignesParSec += ameliorationsAuto[i].cpt * (base * (1 + 0.10 * ameliorationsAuto[i].cpt));
+        }
+
+        // Nouveau coût scaling
+        am.cout = Math.floor(am.cout * Math.pow(1.12 + 0.005 * am.cpt, am.cpt));
+        am.clicAutoAmelioration = getBaseBoost(index) * (1 + 0.10 * am.cpt);
+
         document.getElementById("ligneParSec").textContent = formatNumber(lignesParSec);
         document.getElementById("boostParSec" + index).textContent = formatNumber(am.clicAutoAmelioration);
-        am.cout = Math.floor(am.cout * Math.pow(1.15, am.cpt));
         document.getElementById("prixAmeliorationAuto" + index).textContent = formatNumber(am.cout);
-        afficheligne(lignes);
+
+        afficheligne();
         majprixboost(1000 * lignesParSec + 300);
         activerBoostAuto();
     }
 }
-
 // Fonction pour activer les différentes améliorations de clics automatique
 function activerBoostAuto() {
     if (!intervalBoost) {
@@ -113,18 +123,25 @@ function fetchlclickboost(image, titre) {
         chargerLeaderboard();
         lignes -= affPrixAmeliorationParClic;
         lignesParClic += affAmeliorationParClic;
+        achatsClic++; // Compte les achats
+        
         document.getElementById("ligneParClic").textContent = formatNumber(lignesParClic);
         afficheligne();
+        
         imgAmeliorationParClic.style.pointerEvents = "none";
         setTimeout(() => {
-            affPrixAmeliorationParClic *= 2;
-            affAmeliorationParClic *= 1.1;
+            // Nouvelle formule d'évolution
+            affPrixAmeliorationParClic *= (1.15 + 0.002 * achatsClic);
+            affAmeliorationParClic *= 1.2;
+
             imgAmeliorationParClic.src = image;
             document.getElementById("prixAmeliorationParClic").textContent = formatNumber(affPrixAmeliorationParClic);
             document.getElementById("boostClic").textContent = formatNumber(affAmeliorationParClic);
+
             const item = imgAmeliorationParClic.closest(".item");
             const paragraphs = item.querySelectorAll("p");
             paragraphs[0].childNodes[0].nodeValue = `${titre} coût : `;
+
             imgAmeliorationParClic.style.pointerEvents = "auto";
         }, 0);
     }
@@ -181,44 +198,44 @@ for (let i = 0; i < items.length; i++) {
 }
 
 boost.addEventListener("click", () => {
-        const coutBoost = 1000 * lignesParSec + 300;
-        const dureeBoost = 30; 
+    const coutBoost = 1000 * lignesParSec + 0.01 * lignes + 500;
+    const dureeBoost = 30;
 
-        if (boostActif) return; 
-       
-        majprixboost(coutBoost);
+    if (boostActif) return;
 
-        if (lignes >= coutBoost) {
-            sauvegarderScore()
-            lignes -= coutBoost;
-            afficheligne();
+    majprixboost(coutBoost);
 
-            boostActif = true;  
-            lignesParClic *= 3;  
-            refreshligne();
+    if (lignes >= coutBoost) {
+        sauvegarderScore();
+        lignes -= coutBoost;
+        afficheligne();
 
-            
-            if (intervalBoost2) {
-                clearInterval(intervalBoost2);
-            }
+        boostActif = true;
 
-            let tempsRestant = dureeBoost;
+        // Multiplicateur dynamique basé sur lignesParSec
+        const multiplier = 2 + Math.log10(lignesParSec + 10);
+        lignesParClic *= multiplier;
+        refreshligne();
+
+        if (intervalBoost2) clearInterval(intervalBoost2);
+
+        let tempsRestant = dureeBoost;
+        spanDelaiBoost.textContent = tempsRestant + "s";
+
+        intervalBoost2 = setInterval(() => {
+            tempsRestant--;
             spanDelaiBoost.textContent = tempsRestant + "s";
-
-            intervalBoost2 = setInterval(function() {
-                tempsRestant--;
-                spanDelaiBoost.textContent = tempsRestant + "s";
-                if (tempsRestant <= 0) {
-                    clearInterval(intervalBoost2);  
-                    lignesParClic /= 3; 
-                    afficheligne();
-                    refreshligne();
-                    spanDelaiBoost.textContent = "non disponible"; 
-                    startCooldown();
-                }
-            }, 1000);
-        }
-    });
+            if (tempsRestant <= 0) {
+                clearInterval(intervalBoost2);
+                lignesParClic /= multiplier;
+                afficheligne();
+                refreshligne();
+                spanDelaiBoost.textContent = "non disponible";
+                startCooldown();
+            }
+        }, 1000);
+    }
+});
 
 
 
