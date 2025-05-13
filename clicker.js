@@ -180,7 +180,7 @@ for (let i = 0; i < items.length; i++) {
 
     if (i == 0){
         items[i].addEventListener("click", () => {
-            fetchlclickboost("CLICKER.EXE/images/clavier_mecanique.png", "Clavier mécanique");
+            fetchlclickboost("images/clavier_mecanique.png", "Clavier mécanique");
         });
         document.getElementById("qttItem0").textContent = achatsClic;
     }
@@ -277,7 +277,7 @@ function sauvegarderScore() {
         ameliorationsAuto: ameliorationsAuto
     };
 
-    fetch('CLICKER.EXE/save.php', {
+    fetch('save.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -288,7 +288,7 @@ function sauvegarderScore() {
 let currentPseudo = "";
 
 function chargerSauvegarde(pseudo) {
-    fetch(`CLICKER.EXE/load.php?pseudo=${encodeURIComponent(pseudo)}`)
+    fetch(`load.php?pseudo=${encodeURIComponent(pseudo)}`)
         .then(response => response.json())
         .then(data => {
             if (data) {
@@ -312,7 +312,7 @@ function chargerSauvegarde(pseudo) {
 }
 
 function chargerLeaderboard() {
-    fetch('CLICKER.EXE/leaderboard.php')
+    fetch('leaderboard.php')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Erreur réseau ou serveur : ' + response.status);
