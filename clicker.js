@@ -1,17 +1,17 @@
 // Déclaration variables globales
 let palierFondActuel = 1;
 let lignes = 0;
-let lignesParClic =  1;
+let lignesParClic =  0.2;
 let lignesParSec = 0;
-let affPrixAmeliorationParClic = 10;
-let affAmeliorationParClic = 1;
+let affPrixAmeliorationParClic = 100;
+let affAmeliorationParClic = 0.1;
 let intervalBoost = null;
 let ameliorationsAuto = [
-    { name: 'IDE', cout: 10, clicAutoAmelioration: 1, cpt: 0 },
-    { name: 'Moodle', cout: 50, clicAutoAmelioration: 5, cpt: 0 },
-    { name: 'Pause Café', cout: 100, clicAutoAmelioration: 10, cpt: 0 },
-    { name: 'Maîtrise Algorithmique', cout: 500, clicAutoAmelioration: 20, cpt: 0 },
-    { name: 'Ordinateur Quantique', cout: 2000, clicAutoAmelioration: 50, cpt: 0 }
+    { name: 'IDE', cout: 200, clicAutoAmelioration: 5, cpt: 0 },
+    { name: 'Moodle', cout: 1000, clicAutoAmelioration: 30, cpt: 0 },
+    { name: 'Pause Café', cout: 5000, clicAutoAmelioration: 120, cpt: 0 },
+    { name: 'Maîtrise Algorithmique', cout: 25000, clicAutoAmelioration: 500, cpt: 0 },
+    { name: 'Ordinateur Quantique', cout: 100000, clicAutoAmelioration: 2000, cpt: 0 }
 ];
 
 let boostActif = false;
@@ -30,7 +30,7 @@ let spanDelaiBoost = document.getElementById("delaiboost");
 
 // Pour recalculer le boost de base d'une amélioration auto (selon l'index)
 function getBaseBoost(i) {
-    const base = [1, 5, 10, 20, 50];
+    const base = [5, 30, 120, 500, 2000];
     return base[i];
 }
 
@@ -117,8 +117,8 @@ function fetchlclickboost(image, titre) {
         afficheligne();
         imgAmeliorationParClic.style.pointerEvents = "none";
         setTimeout(() => {
-            affPrixAmeliorationParClic *= 1.35;
-            affAmeliorationParClic *= 1.25;
+            affPrixAmeliorationParClic *= 2;
+            affAmeliorationParClic *= 1.1;
             imgAmeliorationParClic.src = image;
             document.getElementById("prixAmeliorationParClic").textContent = formatNumber(affPrixAmeliorationParClic);
             document.getElementById("boostClic").textContent = formatNumber(affAmeliorationParClic);
