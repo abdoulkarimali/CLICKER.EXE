@@ -76,6 +76,8 @@ function recalculerLignesParSec() {
 function acheterAmeliorationAuto(index) {
     let am = ameliorationsAuto[index];
     if (lignes >= am.cout) {
+        sauvegarderScore();
+        chargerLeaderboard();
         lignes -= am.cout;
         am.cpt++;
         lignesParSec += getBaseBoost(index);
@@ -87,7 +89,6 @@ function acheterAmeliorationAuto(index) {
         afficheligne(lignes);
         majprixboost(1000 * lignesParSec + 300);
         activerBoostAuto();
-        sauvegarderScore(); // Sauvegarde à chaque achat
     }
 }
 
@@ -108,6 +109,8 @@ function activerBoostAuto() {
 // Fonction qui va mettre à jour notre amélioration de clic
 function fetchlclickboost(image, titre) {
     if (lignes >= affPrixAmeliorationParClic) {
+        sauvegarderScore();
+        chargerLeaderboard();
         lignes -= affPrixAmeliorationParClic;
         lignesParClic += affAmeliorationParClic;
         document.getElementById("ligneParClic").textContent = formatNumber(lignesParClic);
@@ -124,7 +127,6 @@ function fetchlclickboost(image, titre) {
             paragraphs[0].childNodes[0].nodeValue = `${titre} coût : `;
             imgAmeliorationParClic.style.pointerEvents = "auto";
         }, 0);
-        sauvegarderScore(); // Sauvegarde à chaque achat
     }
 }
 
@@ -135,8 +137,6 @@ function majprixboost(coutBoost) {
 }
 
 function startCooldown() { 
-
-    
     if (intervalCooldown) {
         clearInterval(intervalCooldown);
     }
@@ -189,6 +189,7 @@ boost.addEventListener("click", () => {
         majprixboost(coutBoost);
 
         if (lignes >= coutBoost) {
+            sauvegarderScore()
             lignes -= coutBoost;
             afficheligne();
 
@@ -331,6 +332,7 @@ startBtn.addEventListener("click", () => {
         currentPseudo = pseudo;
         chargerLeaderboard();
         chargerSauvegarde(pseudo);
+        document.getElementById("joueurPseudo").textContent = `${currentPseudo} Industry`;
         document.getElementById("login-screen").style.display = "none";
         document.getElementById("game").style.display = "block";
         toggleGameInteractions(true);
@@ -338,3 +340,10 @@ startBtn.addEventListener("click", () => {
         alert("Veuillez entrer un pseudo.");
     }
 });
+
+document.getElementById("pseudoInput").addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+        document.getElementById("startGameBtn").click();
+    }
+});
+

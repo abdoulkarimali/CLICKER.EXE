@@ -164,7 +164,7 @@ h2 {
     max-width: 500px;
     font-size: 12px;
     margin-left: 70%;
-    margin-top: -20%;
+    margin-top: -25%;
 }
 #leaderboard h2 {
     color: rgb(223, 30, 30);
@@ -243,14 +243,14 @@ h2 {
     }
     
     #ORDI {
-        margin-top: -2%;
+        margin-top: 0%;
         cursor: pointer;
         width: 170px;
         height: 170px;
         transition: transform 0.1s;
     }
 
-    #leaderboard, #affichageLigne {
+    #affichageLigne {
     text-align: center;
     background: rgba(0, 0, 0, 0.5);
     border-radius: 5px;
@@ -259,6 +259,18 @@ h2 {
     max-width: 350px;
     margin: 8px auto;
     }
+
+    #leaderboard {
+    text-align: center;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 7px;
+    border-radius: 5px;
+    margin: 8px auto;
+    max-width: 350px;
+    font-size: 10px;
+    margin-left: 75%;
+    margin-top: -25%;
+}
     .item {
     cursor: pointer;
     background: rgba(0, 0, 0, 0.7);
@@ -281,6 +293,20 @@ h2 {
         text-shadow: 1px 1px 0 #000, -1px -1px 0 #000;
         font-size: 8px;
         margin: 5px 0;
+    }
+
+    #boost {
+    left: 31%;
+    padding: 10px 18px;
+    }
+    #boost img {
+        width: 60px;
+        height: 60px;
+    }
+
+    #boost .item-text p {
+        font-size: 8px;
+        margin: 4px 0;
     }
 
 }
