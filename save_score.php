@@ -1,42 +1,27 @@
 <?php
-session_start();
-header('Content-Type: application/json');
+require_once 'config.php';
 
-if (!isset($_SESSION['pseudo'])) {
-    http_response_code(403);
-    echo json_encode(['error' => 'Not logged in']);
-    exit;
+header('Content-Type: application/json');
+$response = ["success" => false, "message" => ""];
+
+if (isset($_POST['pseudo']) && isset($_POST['score']) && isset($_POST['upgrades'])) {
+    $pseudo = $conn->real_escape_string($_POST['pseudo']);
+    $score = intval($_POST['score']);
+    $upgrades = $conn->real_escape_string($_POST['upgrades']);
+
+    $sql = "INSERT INTO leaderboard (pseudo, score, upgrades) VALUES ('$pseudo', $score, '$upgrades')";
+
+    if ($conn->query($sql) === TRUE) {
+        $response["success"] = true;
+        $response["message"] = "Score et améliorations enregistrés.";
+    } else {
+        $response["message"] = "Erreur SQL : " . $conn->error;
+    }
+} else {
+    $response["message"] = "Données manquantes (pseudo, score, upgrades).";
 }
 
-$pdo = new PDO('sqlite:scores.db');
-$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+echo json_encode($response);
 
-$pdo->exec("CREATE TABLE IF NOT EXISTS leaderboard (
-    id INTEGER PRIMARY KEY,
-    pseudo TEXT UNIQUE,
-    score INTEGER,
-    upgrades TEXT
-)");
-
-$data = json_decode(file_get_contents('php://input'), true);
-$pseudo = $_SESSION['pseudo'];
-$score = intval($data['score'] ?? 0);
-$upgrades = json_encode($data['upgrades'] ?? []);
-
-$stmt = $pdo->prepare("
-    INSERT INTO leaderboard (pseudo, score, upgrades)
-    VALUES (:pseudo, :score, :upgrades)
-    ON CONFLICT(pseudo)
-    DO UPDATE SET
-        score = MAX(score, excluded.score),
-        upgrades = excluded.upgrades
-");
-
-$stmt->execute([
-    ':pseudo' => $pseudo,
-    ':score' => $score,
-    ':upgrades' => $upgrades
-]);
-
-echo json_encode(['status' => 'score saved']);
+$conn->close();
 ?>

@@ -1,28 +1,44 @@
 <?php
-session_start();
+require_once 'config.php';
+
 header('Content-Type: application/json');
+$response = ["success" => false, "save" => null, "message" => ""];
 
-if (!isset($_SESSION['pseudo'])) {
-    http_response_code(403);
-    echo json_encode(['error' => 'Not logged in']);
-    exit;
-}
+if (isset($_GET['pseudo'])) {
+    $pseudo = $conn->real_escape_string($_GET['pseudo']);
 
-$pdo = new PDO('sqlite:scores.db');
-$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    // On récupère la dernière sauvegarde du joueur
+    $sql = "SELECT score, upgrades FROM leaderboard WHERE pseudo = '$pseudo' ORDER BY id DESC LIMIT 1";
+    $result = $conn->query($sql);
 
-$pseudo = $_SESSION['pseudo'];
+    if ($result && $result->num_rows > 0) {
+        $row = $result->fetch_assoc();
 
-$stmt = $pdo->prepare("SELECT score, upgrades FROM leaderboard WHERE pseudo = ?");
-$stmt->execute([$pseudo]);
-$data = $stmt->fetch(PDO::FETCH_ASSOC);
-
-if ($data) {
-    echo json_encode([
-        'score' => intval($data['score']),
-        'upgrades' => json_decode($data['upgrades'], true)
-    ]);
+        $response['success'] = true;
+        $response['save'] = [
+            "score" => intval($row['score']),
+            "upgrades" => json_decode($row['upgrades'], true)
+        ];
+        $response['message'] = "Sauvegarde trouvée pour $pseudo.";
+    } else {
+        // Si aucune sauvegarde trouvée, renvoyer une sauvegarde vide par défaut
+        $response['success'] = true;
+        $response['save'] = [
+            "score" => 0,
+            "upgrades" => [
+                "name" => 1,
+                "cout" => 10,
+                "clicBoost" => 1,
+                "cpt" => [0, 0, 0, 0, 0]
+            ]
+        ];
+        $response['message'] = "Aucune sauvegarde trouvée pour $pseudo, valeurs par défaut chargées.";
+    }
 } else {
-    echo json_encode(['score' => 0, 'upgrades' => []]);
+    $response['message'] = "Erreur : pseudo manquant dans la requête.";
 }
+
+echo json_encode($response);
+
+$conn->close();
 ?>

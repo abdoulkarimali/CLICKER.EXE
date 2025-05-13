@@ -2,10 +2,15 @@
 session_start();
 header('Content-Type: application/json');
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['pseudo'])) {
-    $_SESSION['pseudo'] = htmlspecialchars($_POST['pseudo']);
-    echo json_encode(['status' => 'ok', 'pseudo' => $_SESSION['pseudo']]);
+$response = ["success" => false, "message" => ""];
+
+if (isset($_POST['pseudo'])) {
+    $_SESSION['pseudo'] = $_POST['pseudo'];
+    $response['success'] = true;
+    $response['message'] = "Pseudo enregistré : " . $_SESSION['pseudo'];
 } else {
-    echo json_encode(['pseudo' => $_SESSION['pseudo'] ?? null]);
+    $response['message'] = "Aucun pseudo reçu.";
 }
+
+echo json_encode($response);
 ?>

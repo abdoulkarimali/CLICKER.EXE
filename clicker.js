@@ -22,65 +22,74 @@ let imgAmeliorationParClic = document.getElementById("imgAmeliorationParClic");
 // === SAUVEGARDE ET CHARGEMENT ===
 
 // Fonction pour charger la sauvegarde depuis le serveur
-function chargerSauvegarde() {
-    fetch('get_save.php')
-        .then(response => response.json())
-        .then(data => {
-            if (data && typeof data.score !== 'undefined') {
-                lignes = data.score;
-                if (data.upgrades && typeof data.upgrades === 'object') {
-                    if (data.upgrades.clic !== undefined) lignesParClic = data.upgrades.clic;
-                    if (data.upgrades.boostClic !== undefined) affAmeliorationParClic = data.upgrades.boostClic;
-                    if (data.upgrades.prixClic !== undefined) affPrixAmeliorationParClic = data.upgrades.prixClic;
-                    for (let i = 0; i < ameliorationsAuto.length; i++) {
-                        let auto = data.upgrades['auto' + i];
-                        if (auto) {
-                            ameliorationsAuto[i].cpt = auto.cpt ?? 0;
-                            ameliorationsAuto[i].cout = auto.cout ?? ameliorationsAuto[i].cout;
-                            ameliorationsAuto[i].clicAutoAmelioration = auto.clicAutoAmelioration ?? ameliorationsAuto[i].clicAutoAmelioration;
-                        }
-
-                    }
-                }
-                recalculerLignesParSec();
-                afficheligne();
-                updateUpgradesDisplay();
-            }
-        })
-        .catch(err => {
-            console.error("Erreur lors du chargement de la sauvegarde", err);
-        });
-}
-
-
-// Fonction pour sauvegarder le score et les upgrades sur le serveur
 function sauvegarderScore() {
-    fetch('save_score.php', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        // Sauvegarde
-body: JSON.stringify({
-    score: lignes,
-    upgrades: {
-        clic: lignesParClic,
-        boostClic: affAmeliorationParClic,
-        prixClic: affPrixAmeliorationParClic,
-        auto0: ameliorationsAuto[0],
-        auto1: ameliorationsAuto[1],
-        auto2: ameliorationsAuto[2],
-        auto3: ameliorationsAuto[3],
-        auto4: ameliorationsAuto[4]
+    const pseudo = document.getElementById("pseudoInput").value.trim();
+    if (!pseudo) {
+        console.warn("Pseudo manquant, pas de sauvegarde.");
+        return;
     }
-})
 
+    const upgrades = {
+        name: ameliorationsAuto.map(auto => auto.name),
+        cout: ameliorationsAuto.map(auto => auto.cout),
+        clicBoost: ameliorationsAuto.map(auto => auto.clicAutoAmelioration),
+        cpt: ameliorationsAuto.map(auto => auto.cpt)
+    };
+
+    fetch('CLICKER.EXE/save_score.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+            pseudo: pseudo,
+            score: lignes,
+            upgrades: JSON.stringify(upgrades)
+        })
     })
     .then(res => res.json())
     .then(data => {
-        if (data.error) {
-            console.error('Erreur:', data.error);
+        if (data.success) {
+            console.log(data.message);
+        } else {
+            console.error("Erreur sauvegarde:", data.message);
         }
     })
-    .catch(err => console.error('Erreur requête:', err));
+    .catch(err => console.error("Erreur réseau save_score:", err));
+}
+
+
+
+// Fonction pour sauvegarder le score et les upgrades sur le serveur
+function chargerSauvegarde() {
+    const pseudo = document.getElementById("pseudoInput").value.trim();
+    if (!pseudo) return;
+
+    fetch(`CLICKER.EXE/get_save.php?pseudo=${encodeURIComponent(pseudo)}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.success && data.save) {
+                const sauvegarde = data.save;
+                lignes = sauvegarde.score;
+
+                if (sauvegarde.upgrades) {
+                    lignesParClic = sauvegarde.upgrades.clic || lignesParClic;
+                    affAmeliorationParClic = sauvegarde.upgrades.clicBoost || affAmeliorationParClic;
+                    affPrixAmeliorationParClic = sauvegarde.upgrades.prixClic || affPrixAmeliorationParClic;
+
+                    if (Array.isArray(sauvegarde.upgrades.autoBoosts)) {
+                        sauvegarde.upgrades.autoBoosts.forEach((cpt, index) => {
+                            ameliorationsAuto[index].cpt = cpt;
+                        });
+                    }
+                }
+
+                recalculerLignesParSec();
+                afficheligne();
+                updateUpgradesDisplay();
+            } else {
+                console.error("Erreur chargement sauvegarde:", data.message);
+            }
+        })
+        .catch(err => console.error("Erreur réseau get_save:", err));
 }
 
 // Sauvegarde automatique toutes les 30 secondes
@@ -203,7 +212,7 @@ const items = document.getElementsByClassName("item");
 for (let i = 0; i < items.length; i++) {
     if (i == 0){
         items[i].addEventListener("click", () => {
-            fetchlclickboost("images/clavier_mecanique.png", "Clavier mécanique");
+            fetchlclickboost("CLICKER.EXE/images/clavier_mecanique.png", "Clavier mécanique");
         });
     }
     else{
@@ -246,7 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // PHP interaction - Session
 function startSession(pseudo) {
-    fetch('session.php', {
+    fetch('CLICKER.EXE/session.php', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: new URLSearchParams({ pseudo })
@@ -262,23 +271,23 @@ function startSession(pseudo) {
 
 // Leaderboard
 function fetchLeaderboard() {
-    fetch('leaderboard.php')
+    fetch('CLICKER.EXE/leaderboard.php')
         .then(res => res.json())
         .then(data => {
-            const board = document.getElementById('leaderboard');
-            if (!Array.isArray(data)) {
-                board.innerHTML = "<p>Erreur lors du chargement du leaderboard.</p>";
-                console.error("Erreur leaderboard:", data);
-                return;
+            if (data.success && Array.isArray(data.leaderboard)) {
+                const board = document.getElementById('leaderboard');
+                board.innerHTML = '<h2>Classement</h2><ol>' +
+                    data.leaderboard.map(player => `
+                        <li>
+                            <span class="pseudo">${player.pseudo}</span>
+                            <span class="score">${player.score}</span>
+                        </li>
+                    `).join('') +
+                    '</ol>';
+            } else {
+                console.error("Erreur leaderboard:", data.message);
+                document.getElementById('leaderboard').innerHTML = "<p>Erreur lors du chargement du leaderboard.</p>";
             }
-            board.innerHTML = '<h2>Classement</h2><ol>' +
-                data.map(player => `
-                    <li>
-                        <span class="pseudo">${player.pseudo}</span>
-                        <span class="score">${player.score}</span>
-                    </li>
-                `).join('') +
-                '</ol>';
         })
         .catch(err => {
             console.error("Erreur réseau:", err);
@@ -316,3 +325,4 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+

@@ -1,10 +1,25 @@
 <?php
-header('Content-Type: application/json');
-$pdo = new PDO('sqlite:scores.db');
-$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+require_once 'config.php';
 
-$result = $pdo->query("SELECT pseudo, score FROM leaderboard ORDER BY score DESC LIMIT 10");
-$leaderboard = $result->fetchAll(PDO::FETCH_ASSOC);
+header('Content-Type: application/json'); 
 
-echo json_encode($leaderboard);
+$response = ["success" => false, "leaderboard" => [], "message" => ""];
+
+$sql = "SELECT pseudo, score, upgrades FROM leaderboard ORDER BY score DESC LIMIT 10";
+$result = $conn->query($sql);
+
+if ($result && $result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $row['upgrades'] = json_decode($row['upgrades'], true);
+        $response['leaderboard'][] = $row;
+    }
+    $response['success'] = true;
+    $response['message'] = "Leaderboard récupéré avec succès.";
+} else {
+    $response['message'] = "Aucun score trouvé.";
+}
+
+echo json_encode($response);
+
+$conn->close();
 ?>
