@@ -1,5 +1,4 @@
 <?php
-
 $host = 'localhost';
 $db = 'clicker';
 $user = 'test';
@@ -18,7 +17,7 @@ try {
 }
 
 try {
-    $stmt = $pdo->query("SELECT pseudo, lignes FROM sauvegardes ORDER BY lignes DESC LIMIT 10");
+    $stmt = $pdo->query("SELECT pseudo, record_lignes AS lignes FROM sauvegardes ORDER BY record_lignes DESC LIMIT 10");
     $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
     echo json_encode($result);
 } catch (PDOException $e) {
