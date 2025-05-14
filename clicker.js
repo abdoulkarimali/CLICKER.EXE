@@ -140,7 +140,41 @@ function startCooldown() {
 
 }
 
+boost.addEventListener("click", () => {
+        const dureeBoost = 30; 
+        coutBoost += 75 * lignesParSec + 300;
+        if (boostActif) return; 
 
+        if (lignes >= coutBoost) {
+            majprixboost(formatNumber(coutBoost));
+            lignes -= coutBoost;
+
+            boostActif = true;  
+            lignesParClic *= 3;  
+
+            
+            if (intervalBoost2) {
+                clearInterval(intervalBoost2);
+            }
+
+            
+            let tempsRestant = dureeBoost;
+            spanDelaiBoost.textContent = tempsRestant + "s";
+
+            intervalBoost2 = setInterval(function() {
+                tempsRestant--;
+                spanDelaiBoost.textContent = tempsRestant + "s";
+                if (tempsRestant <= 0) {
+                    clearInterval(intervalBoost2);  
+                    lignesParClic /= 3; 
+                    updateAffichage();
+                    spanDelaiBoost.textContent = "non disponible"; 
+                    startCooldown();
+                }
+            }, 1000);
+        updateAffichage();
+        }
+});
 
 
 
@@ -166,41 +200,7 @@ for (let i = 0; i < items.length; i++) {
     }
 }
 
-boost.addEventListener("click", () => {
-        const dureeBoost = 30; 
-        coutBoost += 75 * lignesParSec + 300;
-        if (boostActif) return; 
 
-        if (lignes >= coutBoost) {
-            majprixboost(formatNumber(coutBoost));
-            lignes -= coutBoost;
-            updateAffichage();
-
-            boostActif = true;  
-            lignesParClic *= 3;  
-
-            
-            if (intervalBoost2) {
-                clearInterval(intervalBoost2);
-            }
-
-            
-            let tempsRestant = dureeBoost;
-            spanDelaiBoost.textContent = tempsRestant + "s";
-
-            intervalBoost2 = setInterval(function() {
-                tempsRestant--;
-                spanDelaiBoost.textContent = tempsRestant + "s";
-                if (tempsRestant <= 0) {
-                    clearInterval(intervalBoost2);  
-                    lignesParClic /= 3; 
-                    updateAffichage();
-                    spanDelaiBoost.textContent = "non disponible"; 
-                    startCooldown();
-                }
-            }, 1000);
-        }
-});
 
 
 
