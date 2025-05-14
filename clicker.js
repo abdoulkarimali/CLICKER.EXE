@@ -69,7 +69,7 @@ function acheterAmeliorationAuto(index) {
         document.getElementById("boostParSec" + index).textContent = formatNumber(am.clicAutoAmelioration);
         document.getElementById("prixAmeliorationAuto" + index).textContent = formatNumber(am.cout);
         updateAffichage();
-        coutBoost = 75 * lignesParSec + 300;
+        coutBoost += 75 * lignesParSec + 300;
         majprixboost(formatNumber(coutBoost));
         activerBoostAuto();
     }
@@ -168,7 +168,7 @@ for (let i = 0; i < items.length; i++) {
 
 boost.addEventListener("click", () => {
         const dureeBoost = 30; 
-        coutBoost = 75 * lignesParSec + 300;
+        coutBoost += 75 * lignesParSec + 300;
         if (boostActif) return; 
 
         if (lignes >= coutBoost) {
