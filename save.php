@@ -24,48 +24,36 @@ if (empty($data['pseudo'])) {
     exit;
 }
 
-// Récupérer le score actuel en base
-$stmt = $pdo->prepare("SELECT lignes FROM sauvegardes WHERE pseudo = :pseudo");
+// Récupérer le record actuel du joueur
+$stmt = $pdo->prepare("SELECT record_lignes FROM sauvegardes WHERE pseudo = :pseudo");
 $stmt->execute([':pseudo' => $data['pseudo']]);
-$current = $stmt->fetch(PDO::FETCH_ASSOC);
+$currentRecord = $stmt->fetchColumn();
 
-$shouldUpdate = false;
+// Si le nouveau nombre de lignes est supérieur au record, mettre à jour le record
+$newRecord = $data['lignes'];
+$updateRecord = ($newRecord > $currentRecord) ? $newRecord : $currentRecord;
 
-// Si pas d'entrée → nouveau joueur → on insère
-if (!$current) {
-    $shouldUpdate = true;
-} else if ($data['lignes'] > $current['lignes']) {
-    $shouldUpdate = true; // Nouveau score > ancien
-}
+$stmt = $pdo->prepare("
+    INSERT INTO sauvegardes (pseudo, lignes, record_lignes, lignesParClic, lignesParSec, affPrixAmeliorationParClic, affAmeliorationParClic, ameliorationsAuto)
+    VALUES (:pseudo, :lignes, :record_lignes, :lignesParClic, :lignesParSec, :prixClic, :boostClic, :ameliorations)
+    ON DUPLICATE KEY UPDATE
+        lignes = VALUES(lignes),
+        record_lignes = VALUES(record_lignes),
+        lignesParClic = VALUES(lignesParClic),
+        lignesParSec = VALUES(lignesParSec),
+        affPrixAmeliorationParClic = VALUES(affPrixAmeliorationParClic),
+        affAmeliorationParClic = VALUES(affAmeliorationParClic),
+        ameliorationsAuto = VALUES(ameliorationsAuto)
+");
 
-if ($shouldUpdate) {
-    $stmt = $pdo->prepare("
-        INSERT INTO sauvegardes (pseudo, lignes, lignesParClic, lignesParSec, affPrixAmeliorationParClic, affAmeliorationParClic, ameliorationsAuto, nbAchatsClics)
-        VALUES (:pseudo, :lignes, :lignesParClic, :lignesParSec, :prixClic, :boostClic, :ameliorations, :nbAchatsClics)
-        ON DUPLICATE KEY UPDATE
-            lignes = VALUES(lignes),
-            lignesParClic = VALUES(lignesParClic),
-            lignesParSec = VALUES(lignesParSec),
-            affPrixAmeliorationParClic = VALUES(affPrixAmeliorationParClic),
-            affAmeliorationParClic = VALUES(affAmeliorationParClic),
-            ameliorationsAuto = VALUES(ameliorationsAuto),
-            nbAchatsClics = VALUES(nbAchatsClics)
-
-    ");
-    
-    $stmt->execute([
-        ':pseudo' => $data['pseudo'],
-        ':lignes' => $data['lignes'],
-        ':lignesParClic' => $data['lignesParClic'],
-        ':lignesParSec' => $data['lignesParSec'],
-        ':prixClic' => $data['affPrixAmeliorationParClic'],
-        ':boostClic' => $data['affAmeliorationParClic'],
-        ':ameliorations' => json_encode($data['ameliorationsAuto']),
-        ':nbAchatsClics' => $data['nbAchatsClics']
-    ]);
-
-    echo json_encode(['success' => true, 'message' => 'Score mis à jour']);
-} else {
-    echo json_encode(['success' => false, 'message' => 'Score non mis à jour (inférieur ou égal)']);
-}
+$stmt->execute([
+    ':pseudo' => $data['pseudo'],
+    ':lignes' => $data['lignes'],
+    ':record_lignes' => $updateRecord,
+    ':lignesParClic' => $data['lignesParClic'],
+    ':lignesParSec' => $data['lignesParSec'],
+    ':prixClic' => $data['affPrixAmeliorationParClic'],
+    ':boostClic' => $data['affAmeliorationParClic'],
+    ':ameliorations' => json_encode($data['ameliorationsAuto'])
+]);
 ?>
