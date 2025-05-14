@@ -1,18 +1,17 @@
 // Déclaration variables globales
-let palierFondActuel = 1;
 let lignes = 0;
+let record_lignes = 0;
 let lignesParClic =  1;
 let lignesParSec = 0;
 let affPrixAmeliorationParClic = 50;
 let affAmeliorationParClic = 1.5;
-let nbAchatsClics = 0;
 let intervalBoost = null;
 let ameliorationsAuto = [
     { name: 'IDE', cout: 200, clicAutoAmelioration: 5, cpt: 0 },
     { name: 'Moodle', cout: 1000, clicAutoAmelioration: 30, cpt: 0 },
     { name: 'Pause Café', cout: 5000, clicAutoAmelioration: 120, cpt: 0 },
     { name: 'Maîtrise Algorithmique', cout: 25000, clicAutoAmelioration: 500, cpt: 0 },
-    { name: 'Ordinateur Quantique', cout: 1000000, clicAutoAmelioration: 2000, cpt: 0 }
+    { name: 'Ordinateur Quantique', cout: 100000, clicAutoAmelioration: 2000, cpt: 0 }
 ];
 
 let coutBoost = 2000;
@@ -28,8 +27,9 @@ let boost = document.getElementById("boost");
 let spanPrixBoost = document.getElementById("prixboost");
 let spanDelaiBoost = document.getElementById("delaiboost");
 
+// Fonction pour afficher le nombre de lignes
 
-// Formatage des nombres (K, M, B, T)
+// Formatage des nombres (K, M, B, T, P, E)
 function formatNumber(num) {
     if (num >= 1000000000000000000) return `${(num / 1000000000000000000).toFixed(1)}E`;
     if (num >= 1000000000000000) return `${(num / 1000000000000000).toFixed(1)}P`;
@@ -39,50 +39,36 @@ function formatNumber(num) {
     if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
     return num.toFixed(1);
 }
-
-// Fonction qui met à jour le nombre de lignes de code récupérées
-function afficheligne() {
+// Fonction qui met à jour les affichages de la page
+function updateAffichage() {
     document.getElementById("ligne").textContent = formatNumber(lignes);
-}
-
-// Met à jour l'affichage des améliorations (prix, boosts, etc.)
-function updateUpgradesDisplay() {
+    document.getElementById("ligneParClic").textContent = formatNumber(lignesParClic);
+    document.getElementById("ligneParSec").textContent = formatNumber(lignesParSec);
     document.getElementById("prixAmeliorationParClic").textContent = formatNumber(affPrixAmeliorationParClic);
     document.getElementById("boostClic").textContent = formatNumber(affAmeliorationParClic);
-    document.getElementById("qttItem0").textContent = nbAchatsClics;
     for (let i = 0; i < ameliorationsAuto.length; i++) {
         document.getElementById("prixAmeliorationAuto" + i).textContent = formatNumber(ameliorationsAuto[i].cout);
         document.getElementById("boostParSec" + i).textContent = formatNumber(ameliorationsAuto[i].clicAutoAmelioration);
-        document.getElementById("qttItem" + (i+1)).textContent = ameliorationsAuto[i].cpt;
     }
 }
 
-function refreshligne(){
-    document.getElementById("ligneParSec").textContent = formatNumber(lignesParSec);
-    document.getElementById("ligneParClic").textContent = formatNumber(lignesParClic);
-}
-
-function getBaseBoost(index) {
-    const baseBoosts = [5, 30, 120, 500, 2000];
-    return baseBoosts[index] || 0;
+// Pour recalculer le boost de base d'une amélioration auto (selon l'index)
+function getBaseBoost(i) {
+    const base = [5, 30, 120, 500, 2000];
+    return base[i];
 }
 // Fonction gérant l'achat des améliorations de clics automatique
 function acheterAmeliorationAuto(index) {
     let am = ameliorationsAuto[index];
     if (lignes >= am.cout) {
-        sauvegarderScore();
-        chargerLeaderboard();
         lignes -= am.cout;
         am.cpt++;
         lignesParSec += am.clicAutoAmelioration;
         am.cout = Math.floor(am.cout * (1.15 + 0.001 * am.cpt));
         am.clicAutoAmelioration = getBaseBoost(index) * (1 + 0.10 * am.cpt);
-        document.getElementById("qttItem" + (index+1)).textContent = ameliorationsAuto[index].cpt;
-        document.getElementById("ligneParSec").textContent = formatNumber(lignesParSec);
         document.getElementById("boostParSec" + index).textContent = formatNumber(am.clicAutoAmelioration);
         document.getElementById("prixAmeliorationAuto" + index).textContent = formatNumber(am.cout);
-
-        afficheligne();
+        updateAffichage();
         coutBoost = 75 * lignesParSec + 300;
         majprixboost(formatNumber(coutBoost));
         activerBoostAuto();
@@ -97,7 +83,7 @@ function activerBoostAuto() {
             ordi.style.transform = zoomIn ? 'scale(1.2)' : 'scale(1)';
             zoomIn = !zoomIn;
             lignes += lignesParSec;
-            afficheligne(lignes);
+            updateAffichage();
         }, 1000);
     }
 }
@@ -105,19 +91,16 @@ function activerBoostAuto() {
 // Fonction qui va mettre à jour notre amélioration de clic
 function fetchlclickboost(image, titre) {
     if (lignes >= affPrixAmeliorationParClic) {
-        sauvegarderScore();
-        chargerLeaderboard();
-        lignes -= affPrixAmeliorationParClic;
-        lignesParClic += affAmeliorationParClic;
-        nbAchatsClics++;
         
+        lignes -= affPrixAmeliorationParClic;
+        lignesParClic += affAmeliorationParClic;        
         document.getElementById("ligneParClic").textContent = formatNumber(lignesParClic);
-        document.getElementById("qttItem0").textContent = nbAchatsClics;
-        afficheligne();
+        updateAffichage();
+        
         
         imgAmeliorationParClic.style.pointerEvents = "none";
         setTimeout(() => {
-            affPrixAmeliorationParClic *= 1.25;
+            affPrixAmeliorationParClic *= 1.30;
             affAmeliorationParClic *= 1.1;
 
             imgAmeliorationParClic.src = image;
@@ -157,6 +140,32 @@ function startCooldown() {
 
 }
 
+
+
+
+
+
+// GESTION DES EVENTS PRINCIPAUX
+
+ordi.addEventListener("click", () => {
+    lignes += lignesParClic;
+    updateAffichage();
+});
+
+const items = document.getElementsByClassName("item");
+for (let i = 0; i < items.length; i++) {
+    if (i == 0){
+        items[i].addEventListener("click", () => {
+            fetchlclickboost("CLICKER.EXE/images/clavier_mecanique.png", "Clavier mécanique,");
+        });
+    }
+    else{
+        items[i].addEventListener("click", () => {
+            acheterAmeliorationAuto(i-1);
+        });
+    }
+}
+
 boost.addEventListener("click", () => {
         const dureeBoost = 30; 
         coutBoost = 75 * lignesParSec + 300;
@@ -165,11 +174,10 @@ boost.addEventListener("click", () => {
         if (lignes >= coutBoost) {
             majprixboost(formatNumber(coutBoost));
             lignes -= coutBoost;
-            afficheligne();
+            updateAffichage();
 
             boostActif = true;  
             lignesParClic *= 3;  
-            refreshligne();
 
             
             if (intervalBoost2) {
@@ -186,65 +194,13 @@ boost.addEventListener("click", () => {
                 if (tempsRestant <= 0) {
                     clearInterval(intervalBoost2);  
                     lignesParClic /= 3; 
-                    afficheligne();
-                    refreshligne();
+                    updateAffichage();
                     spanDelaiBoost.textContent = "non disponible"; 
                     startCooldown();
                 }
             }, 1000);
         }
 });
-
-
-
-
-
-
-// GESTION DES EVENTS PRINCIPAUX
-
-ordi.addEventListener("click", () => {
-    lignes += lignesParClic;
-    afficheligne(lignes);
-});
-
-const items = document.getElementsByClassName("item");
-for (let i = 0; i < items.length; i++) {
-    if (i == 0){
-        items[i].addEventListener("click", () => {
-            fetchlclickboost("CLICKER.EXE/images/clavier_mecanique.png", "Clavier mécanique");
-        });
-        document.getElementById("qttItem0").textContent = nbAchatsClics;
-    }
-    else{
-        document.getElementById("qttItem" + i).textContent = ameliorationsAuto[i-1].cpt;
-        items[i].addEventListener("click", () => {
-            acheterAmeliorationAuto(i-1);
-        });
-    }
-}
-
-    
-
-function startCooldown() { 
-
-    
-    if (intervalCooldown) {
-        clearInterval(intervalCooldown);
-    }
-
-    intervalCooldown = setInterval(function() {
-        const remainingCooldown = Math.floor(cooldownBoost / 1000);  
-        spanDelaiBoost.textContent = "attendre " + remainingCooldown + "s";
-        cooldownBoost -= 1000;
-        if (cooldownBoost <= 0) {
-            clearInterval(intervalCooldown);  
-            boostActif = false;  
-            spanDelaiBoost.textContent = "Boost disponible";  
-        }
-    }, 1000);
-}
-
-
 
 
 
@@ -265,25 +221,33 @@ function sauvegarderScore() {
     const data = {
         pseudo: currentPseudo,
         lignes: lignes,
+        record_lignes: record_lignes,
         lignesParClic: lignesParClic,
         lignesParSec: lignesParSec,
         affPrixAmeliorationParClic: affPrixAmeliorationParClic,
         affAmeliorationParClic: affAmeliorationParClic,
-        ameliorationsAuto: ameliorationsAuto,
-        nbAchatsClics: nbAchatsClics
+        ameliorationsAuto: ameliorationsAuto
     };
 
     fetch('CLICKER.EXE/save.php', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (!response.ok) {
+            console.error("Erreur de sauvegarde : ", response.statusText);
+        }
+    })
+    .catch(err => {
+        console.error("Erreur réseau lors de la sauvegarde : ", err);
     });
 }
 
 let currentPseudo = "";
 
 function chargerSauvegarde(pseudo) {
-    fetch(`CLICKER.EXE/load.php?pseudo=${encodeURIComponent(pseudo)}`)
+    fetch(`CLICKER.EXE/load.php?pseudo=${encodeURIComponent(pseudo)}&t=${Date.now()}`)
         .then(response => response.json())
         .then(data => {
             if (data) {
@@ -293,12 +257,13 @@ function chargerSauvegarde(pseudo) {
                 affPrixAmeliorationParClic = parseFloat(data.affPrixAmeliorationParClic);
                 affAmeliorationParClic = parseFloat(data.affAmeliorationParClic);
                 ameliorationsAuto = JSON.parse(data.ameliorationsAuto);
-                nbAchatsClics = parseInt(data.nbAchatsClics);
-                majprixboost(coutBoost)
-                afficheligne();
-                refreshligne();
-                updateUpgradesDisplay();
-                activerBoostAuto();
+                record_lignes = parseInt(data.record_lignes);
+                majprixboost(formatNumber(coutBoost));
+                updateAffichage();
+                const hasAutoUpgrade = ameliorationsAuto.some(am => am.cpt > 0);
+                if (hasAutoUpgrade) {
+                    activerBoostAuto();
+                }
             }
         });
 }
@@ -340,14 +305,19 @@ function chargerLeaderboard() {
 
 
 // Sauvegardes automatiques
+
+setInterval(chargerLeaderboard, 1000);
 setInterval(() => {
     if (currentPseudo !== "") {
         sauvegarderScore();
     }
-}, 10000);
-setInterval(chargerLeaderboard, 10000);
+}, 1000);
 
-
+window.addEventListener("beforeunload", () => {
+    if (currentPseudo !== "") {
+        sauvegarderScore();
+    }
+});
 
 
 // Initialisation du jeu au démarrage
@@ -357,7 +327,6 @@ startBtn.addEventListener("click", () => {
     if (pseudo !== "") {
         currentPseudo = pseudo;
         chargerSauvegarde(pseudo);
-        sauvegarderScore();
         chargerLeaderboard();
         document.getElementById("joueurPseudo").textContent = `${currentPseudo} Industry`;
         document.getElementById("login-screen").style.display = "none";
